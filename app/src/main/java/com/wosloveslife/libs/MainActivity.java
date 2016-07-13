@@ -1,27 +1,23 @@
 package com.wosloveslife.libs;
 
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 
-import com.wosloveslife.loopviewpager.adapter.LoopViewPagerAdapter;
-import com.wosloveslife.loopviewpager.view.LoopViewPager;
+/**
+ * 实例首页
+ * Created by WosLovesLife on 2016/7/13.
+ */
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
-
-    private LoopViewPager mLoopViewPager;
-    private LoopViewPager mLoopViewPager2;
+    private Button mLoopView_Btn;
+    private Button mBaseRecyclerView_Btn;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -29,43 +25,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        /* 模拟数据 */
-        List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon1));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
-
-        mLoopViewPager = (LoopViewPager) findViewById(R.id.id_vp_loop_view_pager);
-        mLoopViewPager.setAdapter(new MyLoopAdapter(data));
-        mLoopViewPager.startLoop();
-
-        mLoopViewPager2 = (LoopViewPager) findViewById(R.id.id_vp_loop_view_pager2);
-        mLoopViewPager2.setAdapter(new MyLoopAdapter(data));
-        mLoopViewPager2.setDuration(2500);
-        mLoopViewPager2.startLoop();
+        initView();
     }
 
-    class MyLoopAdapter extends LoopViewPagerAdapter<Bitmap> {
-
-        public MyLoopAdapter(List<Bitmap> data) {
-            super(data);
-        }
-
-        @Override
-        protected View setView(ViewGroup container, int position) {
-            final ImageView imageView = new ImageView(container.getContext());
-            imageView.setImageBitmap(mData.get(position));
-            return imageView;
-        }
+    private void initView() {
+        mLoopView_Btn = (Button) findViewById(R.id.id_btn_loop_view);
+        mLoopView_Btn.setOnClickListener(this);
+        mBaseRecyclerView_Btn = (Button) findViewById(R.id.id_btn_header_recycler_view);
+        mBaseRecyclerView_Btn.setOnClickListener(this);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.id_btn_loop_view:
+                enter(LoopViewExampleActivity.class);
+                break;
+            case R.id.id_btn_header_recycler_view:
+                enter(BaseRecyclerViewExampleActivity.class);
+                break;
+        }
+    }
 
-        mLoopViewPager.stopLoop();
-        mLoopViewPager2.stopLoop();
+    private void enter(Class targetClass) {
+        Intent i = new Intent(this, targetClass);
+        startActivity(i);
     }
 }

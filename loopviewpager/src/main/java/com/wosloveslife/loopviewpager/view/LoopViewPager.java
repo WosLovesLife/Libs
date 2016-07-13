@@ -70,26 +70,65 @@ public class LoopViewPager extends ViewPager {
         setCurrentItem(getCurrentItem() + getAdapter().getCount() / 2);
     }
 
+    /** 停止轮播 */
+    public void stopLoop() {
+        pause();
+
+        mLooping = false;
+    }
+
     /** 调用该方法轮播 */
     private void loop() {
         mHandler.sendEmptyMessageDelayed(0, mDuration);
     }
 
-    /** 停止轮播 */
-    public void stopLoop() {
+    private void pause() {
         mHandler.removeCallbacksAndMessages(null);
     }
 
     /** 设置轮播图的间隔时间 */
     public void setDuration(int duration) {
         mDuration = duration;
-
-        mLooping = false;
     }
+
+
+    private float downX;
+    private float downY;
 
     /** 当手指触摸到该组件时,停止轮播,当手指离开继续轮播 */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downX = ev.getX();
+                downY = ev.getY();
+
+                if (mLooping) {
+                    pause();
+                }
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                float x = ev.getX();
+                float y = ev.getY();
+                float moveX = Math.abs(x - downX);
+                float moveY = Math.abs(y - downY);
+                downX = x;
+                downY = y;
+
+                if (moveX > moveY) {
+                    return super.onTouchEvent(ev);
+                }
+                break;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if (mLooping) {
+                    loop();
+                }
+                break;
+        }
+
         return super.onTouchEvent(ev);
     }
 }
