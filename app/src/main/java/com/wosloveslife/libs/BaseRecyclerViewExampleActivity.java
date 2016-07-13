@@ -54,7 +54,7 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         BaseRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
 
         View view = getLayoutInflater().inflate(R.layout.view_item_recycler_view_header, null, false);
-        adapter.setHeader(new BaseRecyclerViewHolder<List<Bitmap>>(view) {
+        adapter.addHeader(new BaseRecyclerViewHolder<List<Bitmap>>(view) {
 
             @Override
             public void onBind(List<Bitmap> data) {
@@ -69,6 +69,12 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
                 });
                 view.setDuration(1000);
                 view.startLoop();
+            }
+        });
+        adapter.addHeader(new BaseRecyclerViewHolder<Bitmap>(new ImageView(this)) {
+            @Override
+            public void onBind(Bitmap data) {
+                ((ImageView) itemView).setImageBitmap(data);
             }
         });
 

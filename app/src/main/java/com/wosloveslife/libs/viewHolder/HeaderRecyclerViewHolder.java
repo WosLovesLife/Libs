@@ -10,14 +10,14 @@ import com.wosloveslife.baserecyclerview.viewHolder.BaseRecyclerViewHolder;
  * Created by WosLovesLife on 2016/7/13.
  */
 public class HeaderRecyclerViewHolder extends BaseRecyclerViewHolder<String> {
-        protected TextView mTextView;
+    protected TextView mTextView;
 
-        public HeaderRecyclerViewHolder(View itemView) {
-            super(itemView);
-            mTextView = (TextView) itemView;
-        }
-
-        public void onBind(String s) {
-            mTextView.setText(s);
-        }
+    public HeaderRecyclerViewHolder(View itemView) {
+        super(itemView);
+        mTextView = (TextView) itemView;
     }
+
+    public void onBind(String s) {
+        mTextView.setText(s);
+    }
+}

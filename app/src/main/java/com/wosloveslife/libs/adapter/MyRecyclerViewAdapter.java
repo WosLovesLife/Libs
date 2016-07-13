@@ -33,18 +33,26 @@ public class MyRecyclerViewAdapter extends BaseRecyclerViewAdapter {
     }
 
     @Override
-    protected void onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int position) {
+    protected void onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int headerIndex) {
 
         Context context = holder.itemView.getContext();
-        /* 模拟数据 */
-        List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon1));
-        data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon5));
+        switch (headerIndex) {
+            case 0:
+                Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.cartton_tom_and_jerry);
+                holder.onBind(bitmap);
+                break;
+            case 1:
+                /* 模拟数据 */
+                List<Bitmap> data = new ArrayList<>();
+                data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon1));
+                data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon2));
+                data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon3));
+                data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon4));
+                data.add(BitmapFactory.decodeResource(context.getResources(), R.drawable.icon5));
 
-        holder.onBind(data);
+                holder.onBind(data);
+                break;
+        }
     }
 
     @Override
