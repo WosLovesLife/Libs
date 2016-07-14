@@ -9,6 +9,10 @@ import com.wosloveslife.baserecyclerview.viewHolder.BaseRecyclerViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 基础Adapter,继承该Adapter, 实现相关方法
+ * Created by WosLovesLife on 2016/7/13.
+ */
 public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseRecyclerViewHolder> {
     private static final String TAG = "BaseRecyclerViewAdapter";
     private static final int TYPE_HEADER = 1;

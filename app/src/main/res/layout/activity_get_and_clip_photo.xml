@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/id_iv_show_photo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="120dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/id_btn_get_photo_from_album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="从相册获取图片并剪裁"/>
+
+            <Button
+                android:id="@+id/id_btn_get_big_photo_from_album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="从相册获取大图片并剪裁"/>
+
+            <Button
+                android:id="@+id/id_btn_get_custom_photo_from_album"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="从相册获取制定大小图片并剪裁"/>
+            <Button
+                android:id="@+id/id_btn_get_photo_from_camera"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="从相机获取图片并剪裁"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

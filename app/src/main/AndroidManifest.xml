@@ -17,6 +17,7 @@
         </activity>
         <activity android:name=".LoopViewExampleActivity"/>
         <activity android:name=".BaseRecyclerViewExampleActivity"/>
+        <activity android:name=".GetAndClipPhotoActivity"/>
     </application>
 
 </manifest>
