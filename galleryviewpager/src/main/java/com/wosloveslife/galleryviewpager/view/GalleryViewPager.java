@@ -4,17 +4,16 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import com.wosloveslife.galleryviewpager.R;
-import com.wosloveslife.galleryviewpager.transfromer.ZoomOutPageTransformer;
+import com.wosloveslife.galleryviewpager.transfromer.SimpleZoomOutPageTransformer;
 
 /**
- * 实现了基本轮播墙的功能
+ * 使用ViewPager实现3D画廊效果. 左右平移 并动态缩放
  * Created by WosLovesLife on 2016/7/15.
  */
 public class GalleryViewPager extends FrameLayout {
@@ -40,12 +39,12 @@ public class GalleryViewPager extends FrameLayout {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.view_gallery_layout, this);
         mGallery_vp = (ViewPager) view.findViewById(R.id.id_vp_gallery);
 
-        // 1.设置幕后item的缓存数目
+        /* 设置幕后page的缓存数目 */
         mGallery_vp.setOffscreenPageLimit(3);
-        // 2.设置页与页之间的间距
-        mGallery_vp.setPageMargin(10);
-
-        mGallery_vp.setPageTransformer(true, new ZoomOutPageTransformer());
+        /* 设置page之间的间距 */
+        mGallery_vp.setPageMargin(60);
+        /* 设置page切换时的动画 */
+        mGallery_vp.setPageTransformer(true, new SimpleZoomOutPageTransformer());
     }
 
     /** 设置数据Adapter */
@@ -58,25 +57,7 @@ public class GalleryViewPager extends FrameLayout {
         mGallery_vp.setPageTransformer(reverseDrawingOrder, transformer);
     }
 
-    /** 设置主要区域的尺寸 */
-    public void setMainPageSize(int width, int height) {
-        int selfWidth = getMeasuredWidth();
-        int selfHeight = getMeasuredHeight();
-
-        Log.w(TAG, "setMainPageSize: selfWidth = " + selfWidth + "; selfHeight = " + selfHeight);
-
-        if (width > selfWidth) width = selfWidth;
-        if (height > selfHeight) height = selfHeight;
-
-        int left = selfWidth - width;
-        int right = selfHeight - height;
-
-        FrameLayout.LayoutParams params = (LayoutParams) getLayoutParams();
-        params.setMargins(left, 0, right, 0);
-        mGallery_vp.setLayoutParams(params);
-    }
-
-    // 3.将父类的touch事件分发至viewPgaer，否则只能滑动中间的一个view对象
+    /** 将touchEvent分发至viewPager，否则只能滑动中间的一个view对象 */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return mGallery_vp.dispatchTouchEvent(event);

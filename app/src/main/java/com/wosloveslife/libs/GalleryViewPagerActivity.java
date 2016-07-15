@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * GalleryViewPager示例
  * Created by WosLovesLife on 2016/7/15.
  */
 public class GalleryViewPagerActivity extends AppCompatActivity {
@@ -43,7 +44,6 @@ public class GalleryViewPagerActivity extends AppCompatActivity {
                 return imageView;
             }
         });
-//        mGalleryViewPager.setMainPageSize(80,80);
     }
 
     private List<Bitmap> getData() {
