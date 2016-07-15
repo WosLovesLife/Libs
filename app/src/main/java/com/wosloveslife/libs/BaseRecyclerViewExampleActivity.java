@@ -61,7 +61,7 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
                 LoopViewPager view = (LoopViewPager) itemView.findViewById(R.id.id_vp_loop_view_pager);
                 view.setAdapter(new LoopViewPagerAdapter<Bitmap>(data) {
                     @Override
-                    protected View setView(ViewGroup container, int position) {
+                    protected View onCreateView(ViewGroup container, int position) {
                         ImageView imageView = new ImageView(container.getContext());
                         imageView.setImageBitmap(mData.get(position));
                         return imageView;

@@ -22,4 +22,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="GetAndClipPhoto样例"/>
+
+    <Button
+        android:id="@+id/id_btn_gallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="GalleryViewPager样例"/>
 </LinearLayout>

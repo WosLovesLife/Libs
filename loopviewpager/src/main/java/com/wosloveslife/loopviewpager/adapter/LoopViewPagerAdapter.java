@@ -40,14 +40,14 @@ public abstract class LoopViewPagerAdapter<T> extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = setView(container, position % mData.size());
+        View view = onCreateView(container, position % mData.size());
 
         container.addView(view);
         return view;
     }
 
     /** 实现该方法,返回View对象,即可显示在轮播图中 */
-    protected abstract View setView(ViewGroup container, int position);
+    protected abstract View onCreateView(ViewGroup container, int position);
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {

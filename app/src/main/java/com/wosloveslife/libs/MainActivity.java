@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mLoopView_Btn;
     private Button mBaseRecyclerView_Btn;
     private Button mGetAndClipPhoto_Btn;
+    private Button mGallery_Btn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,8 +37,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBaseRecyclerView_Btn = (Button) findViewById(R.id.id_btn_header_recycler_view);
         mBaseRecyclerView_Btn.setOnClickListener(this);
 
-        mGetAndClipPhoto_Btn = (Button) findViewById(R.id.id_btn_clip_photo);;
+        mGetAndClipPhoto_Btn = (Button) findViewById(R.id.id_btn_clip_photo);
         mGetAndClipPhoto_Btn.setOnClickListener(this);
+
+        mGallery_Btn = (Button) findViewById(R.id.id_btn_gallery);
+        mGallery_Btn.setOnClickListener(this);
     }
 
     @Override
@@ -51,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.id_btn_clip_photo:
                 enter(GetAndClipPhotoActivity.class);
+                break;
+            case R.id.id_btn_gallery:
+                enter(GalleryViewPagerActivity.class);
                 break;
         }
     }

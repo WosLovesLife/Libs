@@ -18,6 +18,7 @@
         <activity android:name=".LoopViewExampleActivity"/>
         <activity android:name=".BaseRecyclerViewExampleActivity"/>
         <activity android:name=".GetAndClipPhotoActivity"/>
+        <activity android:name=".GalleryViewPagerActivity"/>
     </application>
 
 </manifest>

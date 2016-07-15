@@ -56,7 +56,7 @@ public class LoopViewExampleActivity extends AppCompatActivity{
         }
 
         @Override
-        protected View setView(ViewGroup container, int position) {
+        protected View onCreateView(ViewGroup container, int position) {
             final ImageView imageView = new ImageView(container.getContext());
             imageView.setImageBitmap(mData.get(position));
             return imageView;
