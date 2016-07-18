@@ -1,6 +1,7 @@
 package com.wosloveslife.libs;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -13,7 +14,6 @@ import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 
 import com.wosloveslife.baserecyclerview.adapter.BaseRecyclerViewAdapter;
-import com.wosloveslife.baserecyclerview.viewHolder.BaseRecyclerViewHolder;
 import com.wosloveslife.libs.adapter.MyRecyclerViewAdapter;
 import com.wosloveslife.loopviewpager.adapter.LoopViewPagerAdapter;
 import com.wosloveslife.loopviewpager.view.LoopViewPager;
@@ -52,34 +52,28 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         }
 
         BaseRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
+        mRecyclerView.setAdapter(adapter);
 
         View view = getLayoutInflater().inflate(R.layout.view_item_recycler_view_header, null, false);
-        adapter.addHeader(new BaseRecyclerViewHolder<List<Bitmap>>(view) {
+        LoopViewPager loopViewPager = (LoopViewPager) view.findViewById(R.id.id_vp_loop_view_pager);
 
+        List<Bitmap> simulatedData = getSimulatedData();
+        loopViewPager.setAdapter(new LoopViewPagerAdapter<Bitmap>(simulatedData) {
             @Override
-            public void onBind(List<Bitmap> data) {
-                LoopViewPager view = (LoopViewPager) itemView.findViewById(R.id.id_vp_loop_view_pager);
-                view.setAdapter(new LoopViewPagerAdapter<Bitmap>(data) {
-                    @Override
-                    protected View onCreateView(ViewGroup container, int position) {
-                        ImageView imageView = new ImageView(container.getContext());
-                        imageView.setImageBitmap(mData.get(position));
-                        return imageView;
-                    }
-                });
-                view.setDuration(1000);
-                view.startLoop();
+            protected View onCreateView(ViewGroup container, int position) {
+                ImageView imageView = new ImageView(container.getContext());
+                imageView.setImageBitmap(mData.get(position));
+                return imageView;
             }
         });
-        adapter.addHeader(new BaseRecyclerViewHolder<Bitmap>(new ImageView(this)) {
-            @Override
-            public void onBind(Bitmap data) {
-                ((ImageView) itemView).setImageBitmap(data);
-            }
-        });
+        loopViewPager.setDuration(1000);
+        loopViewPager.startLoop();
+        adapter.addHeader(view);
 
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(R.drawable.icon5);
+        adapter.addHeader(imageView);
 
-        mRecyclerView.setAdapter(adapter);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
@@ -91,5 +85,16 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    /** 模拟数据 */
+    private List<Bitmap> getSimulatedData(){
+        List<Bitmap> data = new ArrayList<>();
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon1));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
+        return data;
     }
 }

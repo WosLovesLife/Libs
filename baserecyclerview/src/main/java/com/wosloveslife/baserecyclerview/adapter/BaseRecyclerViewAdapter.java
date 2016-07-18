@@ -2,6 +2,7 @@ package com.wosloveslife.baserecyclerview.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.wosloveslife.baserecyclerview.viewHolder.BaseRecyclerViewHolder;
@@ -21,7 +22,7 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
     protected List<BaseRecyclerViewHolder> mHeaderViewHolders;
     private int mTypeCount;
 
-    public BaseRecyclerViewAdapter(){
+    public BaseRecyclerViewAdapter() {
     }
 
     public BaseRecyclerViewAdapter(List<String> data) {
@@ -39,7 +40,7 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
         }
     }
 
-    /** 重新此方法 创建一般条目的ViewHolder时调用 */
+    /** 重写此方法 创建一般条目的ViewHolder时调用 */
     protected abstract BaseRecyclerViewHolder onCreateItemViewHolder(ViewGroup parent);
 
     /** 在该方法中对不同的条目类型进行区分, 并算出每种类型对应的数据数据position */
@@ -48,7 +49,8 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
         if (mTypeCount > 0) {
             Log.w(TAG, "onBindViewHolder: position = " + position);
             if (position < mTypeCount) {
-                onBindHeaderViewHolder(holder, position);
+                /* 作废 */
+//                onBindHeaderViewHolder(holder, position);
             } else {
                 onBindItemViewHolder(holder, position - mTypeCount);
             }
@@ -57,14 +59,11 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
         }
     }
 
-    /** 实现该方法, 绑定Header条目的ViewHolder时调用 */
-    protected abstract void onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int position);
+    /** 已废除.  实现该方法, 绑定Header条目的ViewHolder时调用 */
+//    protected abstract void _onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int position);
 
     /** 实现该方法, 绑定普通条目的ViewHolder时调用 */
     protected abstract void onBindItemViewHolder(BaseRecyclerViewHolder holder, int position);
-
-//    预留方案, 不区分普通条目或是Header条目
-//    protected abstract void bind(BaseRecyclerViewHolder holder, int type, int position);
 
     @Override
     public int getItemCount() {
@@ -96,9 +95,21 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
     }
 
     /** 实现BaseRecyclerViewHolder 添加头部的View. 后添加的出现在最上面. */
-    public void addHeader(BaseRecyclerViewHolder headerViewHolder) {
+    public void _addHeader(BaseRecyclerViewHolder headerViewHolder) {
         mHeaderViewHolders.add(0, headerViewHolder);
 
         notifyDataSetChanged();
+    }
+
+    /** 添加头部的View. 后添加的出现在最上面. */
+    public void addHeader(View headerView) {
+        BaseRecyclerViewHolder viewHolder = new BaseRecyclerViewHolder(headerView) {
+            @Override
+            public void onBind(Object data) {
+            }
+        };
+        mHeaderViewHolders.add(0, viewHolder);
+
+        notifyItemChanged(0);
     }
 }
