@@ -20,6 +20,8 @@
         <activity android:name=".GetAndClipPhotoActivity"/>
         <activity android:name=".GalleryViewPagerActivity"/>
         <activity android:name=".linkage.LinkageActivity"/>
+        <activity android:name=".linkage.EnterAlwaysLinkageActivity"/>
+        <activity android:name=".linkage.Pull2BlurLinkageActivity"/>
     </application>
 
 </manifest>
