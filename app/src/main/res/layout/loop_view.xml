@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wosloveslife.loopviewpager.view.LoopViewPager
+        android:id="@+id/id_vp_loop_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+    </com.wosloveslife.loopviewpager.view.LoopViewPager>
+</FrameLayout>

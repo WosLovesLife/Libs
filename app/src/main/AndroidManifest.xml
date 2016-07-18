@@ -19,6 +19,7 @@
         <activity android:name=".BaseRecyclerViewExampleActivity"/>
         <activity android:name=".GetAndClipPhotoActivity"/>
         <activity android:name=".GalleryViewPagerActivity"/>
+        <activity android:name=".linkage.LinkageActivity"/>
     </application>
 
 </manifest>

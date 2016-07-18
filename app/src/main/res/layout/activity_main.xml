@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <android.support.v7.widget.Toolbar
+            app:title="Libs库 示例"
+            android:id="@+id/id_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@android:style/Widget.Holo.Light.ActionButton.Overflow">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
     <Button
         android:id="@+id/id_btn_loop_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="LoopView样例"/>
+        android:text="LoopView示例"/>
 
     <Button
         android:id="@+id/id_btn_header_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BaseRecyclerView样例"/>
+        android:text="BaseRecyclerView示例"/>
 
     <Button
         android:id="@+id/id_btn_clip_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GetAndClipPhoto样例"/>
+        android:text="GetAndClipPhoto示例"/>
 
     <Button
         android:id="@+id/id_btn_gallery"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="GalleryViewPager样例"/>
+        android:text="GalleryViewPager示例"/>
+
+    <Button
+        android:id="@+id/id_btn_linkage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Linkage联动效果示例"/>
 </LinearLayout>
