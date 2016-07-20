@@ -49,7 +49,7 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
         if (mTypeCount > 0) {
             Log.w(TAG, "onBindViewHolder: position = " + position);
             if (position < mTypeCount) {
-                /* 作废 */
+                /* 已废除 */
 //                onBindHeaderViewHolder(holder, position);
             } else {
                 onBindItemViewHolder(holder, position - mTypeCount);
@@ -98,7 +98,7 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
     public void _addHeader(BaseRecyclerViewHolder headerViewHolder) {
         mHeaderViewHolders.add(0, headerViewHolder);
 
-        notifyDataSetChanged();
+        notifyItemChanged(0);
     }
 
     /** 添加头部的View. 后添加的出现在最上面. */

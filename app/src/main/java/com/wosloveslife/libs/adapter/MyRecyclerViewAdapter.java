@@ -22,8 +22,10 @@ public class MyRecyclerViewAdapter extends BaseRecyclerViewAdapter {
     @Override
     protected BaseRecyclerViewHolder onCreateItemViewHolder(ViewGroup parent) {
         Button textView = new Button(parent.getContext());
-        textView.setWidth(parent.getWidth());
-        textView.setHeight(100);
+        ViewGroup.LayoutParams params = parent.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        textView.setLayoutParams(params);
         return new HeaderRecyclerViewHolder(textView);
     }
 
