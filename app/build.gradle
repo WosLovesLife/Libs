@@ -31,4 +31,5 @@ dependencies {
     compile project(':galleryviewpager')
     compile 'com.android.support:design:24.0.0'
     compile 'com.jakewharton:butterknife:5.1.1'
+    compile project(':utils')
 }

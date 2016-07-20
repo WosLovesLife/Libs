@@ -14,25 +14,25 @@ import java.util.List;
  * 基础Adapter,继承该Adapter, 实现相关方法
  * Created by WosLovesLife on 2016/7/13.
  */
-public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseRecyclerViewHolder> {
+public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<BaseRecyclerViewHolder<T>> {
     private static final String TAG = "BaseRecyclerViewAdapter";
     private static final int TYPE_HEADER = 1;
 
-    protected List<String> mData;
-    protected List<BaseRecyclerViewHolder> mHeaderViewHolders;
+    protected List<T> mData;
+    protected List<BaseRecyclerViewHolder<T>> mHeaderViewHolders;
     private int mTypeCount;
 
     public BaseRecyclerViewAdapter() {
     }
 
-    public BaseRecyclerViewAdapter(List<String> data) {
+    public BaseRecyclerViewAdapter(List<T> data) {
         mData = data;
 
         mHeaderViewHolders = new ArrayList<>();
     }
 
     @Override
-    public BaseRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseRecyclerViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
         if (mTypeCount > 0 && viewType >= TYPE_HEADER) {
             return mHeaderViewHolders.get(viewType - 1);
         } else {
@@ -41,11 +41,11 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
     }
 
     /** 重写此方法 创建一般条目的ViewHolder时调用 */
-    protected abstract BaseRecyclerViewHolder onCreateItemViewHolder(ViewGroup parent);
+    protected abstract BaseRecyclerViewHolder<T> onCreateItemViewHolder(ViewGroup parent);
 
     /** 在该方法中对不同的条目类型进行区分, 并算出每种类型对应的数据数据position */
     @Override
-    public void onBindViewHolder(BaseRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(BaseRecyclerViewHolder<T> holder, int position) {
         if (mTypeCount > 0) {
             Log.w(TAG, "onBindViewHolder: position = " + position);
             if (position < mTypeCount) {
@@ -63,7 +63,9 @@ public abstract class BaseRecyclerViewAdapter extends RecyclerView.Adapter<BaseR
 //    protected abstract void _onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int position);
 
     /** 实现该方法, 绑定普通条目的ViewHolder时调用 */
-    protected abstract void onBindItemViewHolder(BaseRecyclerViewHolder holder, int position);
+    protected void onBindItemViewHolder(BaseRecyclerViewHolder<T> holder, int position){
+        holder.onBind(mData.get(position));
+    };
 
     @Override
     public int getItemCount() {

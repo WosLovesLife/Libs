@@ -1,1 +1,1 @@
-include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager'
+include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager', ':utils'
