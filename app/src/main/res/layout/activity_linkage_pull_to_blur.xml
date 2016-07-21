@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/id_fl_root_view"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
@@ -12,12 +13,13 @@
     </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/id_toolbar"
+        android:id="@+id/id_app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
+            android:id="@+id/id_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"

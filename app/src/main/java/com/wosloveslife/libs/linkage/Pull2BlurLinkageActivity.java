@@ -3,7 +3,6 @@ package com.wosloveslife.libs.linkage;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +22,7 @@ import com.wosloveslife.libs.R;
 import com.wosloveslife.libs.adapter.MyRecyclerViewAdapter;
 import com.wosloveslife.utils.Dp2Px;
 import com.wosloveslife.utils.wrapper_picture.BlurUtils;
+import com.wosloveslife.utils.wrapper_picture.CropPicture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +76,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     }
 
     private void initActionbar() {
-        mActionbar = (AppBarLayout) findViewById(R.id.id_toolbar);
-//        mActionbar.setAlpha(0f);
+        mActionbar = (AppBarLayout) findViewById(R.id.id_app_bar_layout);
+        mActionbar.setAlpha(0f);
     }
 
     private void initHeaderView() {
@@ -88,7 +88,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
          * 因为条目可能获取不到LayoutParams,所以手动设置一个 */
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderHeight);
         mImageView.setLayoutParams(params);
-        mOriginBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.header_bg);
+//        mOriginBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.header_bg1);
+        mOriginBitmap = CropPicture.getScaledDrawable(this, R.drawable.header_bg2, Dp2Px.toPX(getApplicationContext(), 200), Dp2Px.toPX(getApplicationContext(), 200)).getBitmap();
         mImageView.setImageBitmap(mOriginBitmap);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
@@ -139,7 +140,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理Actionbar的联动效果 */
     private void disposeActionbarLinkage(int dy) {
-        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight"+mHeaderHeight );
+        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight" + mHeaderHeight);
         if (mHeaderHeight == 0) return;
 
         float rate = (dy + 0f) / (mHeaderHeight + 0f);
@@ -200,36 +201,44 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mImageView.setScaleX(mTargetScale);
         mImageView.setScaleY(mTargetScale);
 
-        disposeHeaderBlur(dy * SCALE_GROWTH_RATE);
+        disposeHeaderBlur(dy);
+
         return true;
     }
+
+    float mTY;
 
     /**
      * 对HeaderView进行模糊处理
      *
-     * @param dy
+     * @param dy y轴移动的距离
      */
     private void disposeHeaderBlur(float dy) {
-        float radius = dy * 25f;
-//        Log.w(TAG, "disposeHeaderView: radius = " + radius + "; dy = " + dy);
+        if (dy == 0) return;
+
+        /*  */
+        mTY += dy;
 
         /* 为了避免反复的模糊渲染 */
-        if (mBlurRadius == radius || radius == 0) return;
-        mBlurRadius = radius;
+        if (dy >0 && mTY < 9 ) return;
+        if (dy <0 && mTY > -9) return;
+
+        mBlurRadius += (mTY * 0.1f);
+        mTY = 0;
 
         /* 说明还没有进行过模糊处理, 将原图背景存起来 */
-        if (mBlurBgs == null) {
+        if (mBlurBgs == null || mBlurBgs.size() < 1) {
             mBlurBgs = new ArrayList<>();
             Bitmap origin = mOriginBitmap;
-            origin = ThumbnailUtils.extractThumbnail(origin, (int) (origin.getWidth() / 1.5f), (int) (origin.getHeight() / 1.5f));
+            origin = ThumbnailUtils.extractThumbnail(origin, (int) (origin.getWidth() / 2f), (int) (origin.getHeight() / 2f));
             mBlurBgs.add(origin);
         }
 
         Bitmap bitmap;
         /* 正数表明当下是向下拉,需要进行模糊处理 */
-        if (mBlurRadius > 0) {
-            /*bitmap = Blur.blurBitmap(getApplicationContext(), bitmap, Math.abs(mBlurRadius));*/
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mBlurBgs.get(mBlurBgs.size() - 1), mImageView, mBlurRadius).getBitmap();
+        if (dy > 0) {
+           /* 对原图片进行高斯模糊处理 */
+            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mBlurBgs.get(0), mImageView, 1, mBlurRadius);
             mBlurBgs.add(bitmap);
         }
         /* 负数说明当前是向上拉,则应该逐渐清晰 */
@@ -242,6 +251,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
                 bitmap = mOriginBitmap;
             }
         }
+
+//        Log.w(TAG, "disposeHeaderBlur: mBlurBgs.size() = " + mBlurBgs.size());
         mImageView.setImageBitmap(bitmap);
     }
 
@@ -280,6 +291,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
             toBlurDefault();
         }
         mY = DEFAULT_VALUE;
+        mBlurRadius = 0;
     }
 
     private void toBlurDefault() {
