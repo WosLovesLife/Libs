@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 /**
- * Created by zhangH on 2016/6/1.
+ * Created by WosLovesLife on 2016/6/1.
  */
 public class BlurUtils {
 

@@ -3,7 +3,7 @@ package com.wosloveslife.libs.linkage;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,9 +11,9 @@ import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,6 +45,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private int mHeaderHeight;
     private float mTargetScale;
     private float mBlurRadius;
+    private Bitmap mOriginBitmap;
 
     // Widgets
     private AppBarLayout mActionbar;
@@ -76,30 +77,20 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     private void initActionbar() {
         mActionbar = (AppBarLayout) findViewById(R.id.id_toolbar);
-        mActionbar.setAlpha(0f);
+//        mActionbar.setAlpha(0f);
     }
 
     private void initHeaderView() {
         // header
         mImageView = new ImageView(this);
+        mHeaderHeight = Dp2Px.toPX(getApplicationContext(), 200);
         /* 设置第一个处于顶端的Header的MarinTop为Toolbar的高度,避免被遮挡
          * 因为条目可能获取不到LayoutParams,所以手动设置一个 */
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Dp2Px.toPX(getApplicationContext(), 180));
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderHeight);
         mImageView.setLayoutParams(params);
-        mImageView.setImageResource(R.drawable.header_bg);
+        mOriginBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.header_bg);
+        mImageView.setImageBitmap(mOriginBitmap);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-        /* 获取Toolbar的高度 */
-        mImageView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mImageView.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                mHeaderHeight = mImageView.getHeight();
-
-                return true;
-            }
-        });
     }
 
     /** 获取模拟数据 */
@@ -148,17 +139,17 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理Actionbar的联动效果 */
     private void disposeActionbarLinkage(int dy) {
+        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight"+mHeaderHeight );
         if (mHeaderHeight == 0) return;
 
         float rate = (dy + 0f) / (mHeaderHeight + 0f);
 
-        float currentAlpha = mActionbar.getAlpha();
+        if (mLinearLayoutManager.findFirstVisibleItemPosition() > 0f && rate < 0f) return;
 
-//        Log.w(TAG, "onTouch: currentAlpha = " + currentAlpha + "; dy = " + dy + "; mHeaderHeight =" + mHeaderHeight + "; rate = " + rate);
+        float currentAlpha = mActionbar.getAlpha();
 
         /* 这一重判断是为了增加效率,避免频繁的调用setAlpha() */
         if (currentAlpha >= 1f && rate > 0f
-                || mLinearLayoutManager.findFirstVisibleItemPosition() > 0f && rate < 0f
                 || currentAlpha <= 0f && rate < 0f) {
             return;
         }
@@ -229,16 +220,15 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 说明还没有进行过模糊处理, 将原图背景存起来 */
         if (mBlurBgs == null) {
             mBlurBgs = new ArrayList<>();
-            Bitmap origin = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
+            Bitmap origin = mOriginBitmap;
+            origin = ThumbnailUtils.extractThumbnail(origin, (int) (origin.getWidth() / 1.5f), (int) (origin.getHeight() / 1.5f));
             mBlurBgs.add(origin);
         }
 
         Bitmap bitmap;
         /* 正数表明当下是向下拉,需要进行模糊处理 */
         if (mBlurRadius > 0) {
-            Bitmap origin = mBlurBgs.get(0);
-            bitmap = ThumbnailUtils.extractThumbnail(origin, origin.getWidth() / 10, origin.getHeight() / 10);
-//            bitmap = Blur.blurBitmap(getApplicationContext(), bitmap, Math.abs(mBlurRadius));
+            /*bitmap = Blur.blurBitmap(getApplicationContext(), bitmap, Math.abs(mBlurRadius));*/
             bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mBlurBgs.get(mBlurBgs.size() - 1), mImageView, mBlurRadius).getBitmap();
             mBlurBgs.add(bitmap);
         }
@@ -249,7 +239,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
                 bitmap = mBlurBgs.get(lastIndex);
                 mBlurBgs.remove(lastIndex);
             } else {
-                bitmap = mBlurBgs.get(0);
+                bitmap = mOriginBitmap;
             }
         }
         mImageView.setImageBitmap(bitmap);
@@ -295,7 +285,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private void toBlurDefault() {
         // 模糊相关的内容恢复
         if (mBlurBgs != null) {
-            mImageView.setImageBitmap(mBlurBgs.get(0));
+            mImageView.setImageBitmap(mOriginBitmap);
             mBlurBgs.clear();
             mBlurBgs = null;
         }

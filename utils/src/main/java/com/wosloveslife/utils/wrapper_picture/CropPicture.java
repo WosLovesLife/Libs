@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.view.Display;
 
 /**
+ * 裁剪压缩图片
  * Created by WosLovesLife on 2016/7/20.
  */
 public class CropPicture {
