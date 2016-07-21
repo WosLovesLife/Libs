@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -18,17 +19,7 @@ public class LoopViewPager extends ViewPager {
     private boolean mLooping;
     private int mDuration = 5000;
 
-    Handler mHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 0:
-                    nextPager();
-                    break;
-            }
-        }
-    };
+    Handler mHandler;
 
     /** 对于轮播的处理, 跳转到下一页 */
     private void nextPager() {
@@ -58,6 +49,21 @@ public class LoopViewPager extends ViewPager {
     /** 开始轮播 */
     public void startLoop() {
         if (!mLooping) {
+            Log.w("LoopViewPager", "startLoop: mheander == null" + (mHandler == null));
+            if (mHandler == null) {
+                mHandler = new Handler(Looper.getMainLooper()) {
+                    @Override
+                    public void handleMessage(Message msg) {
+                        super.handleMessage(msg);
+                        switch (msg.what) {
+                            case 0:
+                                nextPager();
+                                break;
+                        }
+                    }
+                };
+            }
+
             loop();
             mLooping = true;
         }
@@ -70,9 +76,10 @@ public class LoopViewPager extends ViewPager {
         setCurrentItem(getCurrentItem() + getAdapter().getCount() / 2);
     }
 
-    /** 停止轮播 */
+    /** 停止轮播, 注意!!! 一定要在Activity销毁前调用该方法, 不然会导致内存泄露  */
     public void stopLoop() {
         pause();
+        mHandler = null;
 
         mLooping = false;
     }

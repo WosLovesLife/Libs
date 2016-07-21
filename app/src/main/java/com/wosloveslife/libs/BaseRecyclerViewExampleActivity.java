@@ -29,6 +29,7 @@ import java.util.List;
 public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
+    private LoopViewPager mLoopViewPager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,10 +56,10 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(adapter);
 
         View view = getLayoutInflater().inflate(R.layout.view_item_recycler_view_header, null, false);
-        LoopViewPager loopViewPager = (LoopViewPager) view.findViewById(R.id.id_vp_loop_view_pager);
+        mLoopViewPager = (LoopViewPager) view.findViewById(R.id.id_vp_loop_view_pager);
 
         List<Bitmap> simulatedData = getSimulatedData();
-        loopViewPager.setAdapter(new LoopViewPagerAdapter<Bitmap>(simulatedData) {
+        mLoopViewPager.setAdapter(new LoopViewPagerAdapter<Bitmap>(simulatedData) {
             @Override
             protected View onCreateView(ViewGroup container, int position) {
                 ImageView imageView = new ImageView(container.getContext());
@@ -66,8 +67,8 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
                 return imageView;
             }
         });
-        loopViewPager.setDuration(1000);
-        loopViewPager.startLoop();
+        mLoopViewPager.setDuration(1000);
+        mLoopViewPager.startLoop();
         adapter.addHeader(view);
 
         ImageView imageView = new ImageView(this);
@@ -96,5 +97,11 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
         data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
         return data;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLoopViewPager.stopLoop();
     }
 }

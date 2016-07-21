@@ -73,24 +73,6 @@ public class EnterAlwaysLinkageActivity extends AppCompatActivity {
 
         BaseRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
 
-        /* 暂不使用 */
-        /*View view = getLayoutInflater().inflate(R.layout.loop_view, null, false);
-
-        *//* 设置轮播图的Adapter等设置 *//*
-        LoopViewPager loopViewPager = (LoopViewPager) view.findViewById(R.id.id_vp_loop_view_pager);
-        loopViewPager.setAdapter(new LoopViewPagerAdapter<Bitmap>(getSimulatedData()) {
-
-            @Override
-            protected View onCreateView(ViewGroup container, int position) {
-                ImageView imageView = new ImageView(container.getContext());
-                imageView.setImageBitmap(mData.get(position));
-                return imageView;
-            }
-        });
-        loopViewPager.setDuration(1000);
-        loopViewPager.startLoop();
-        adapter.addHeader(view);*/
-
         final ImageView imageView = new ImageView(this);
         /* 设置第一个处于顶端的Header的MarinTop为Toolbar的高度,避免被遮挡
          * 因为条目可能获取不到LayoutParams,所以手动设置一个 */
@@ -127,6 +109,8 @@ public class EnterAlwaysLinkageActivity extends AppCompatActivity {
                     marginTop = -mActionBarHeight;
                 }
 
+                int height = mToolbar.getHeight();
+                Log.w(TAG, "onScrolled: mToolbar.getHeight() = "+height );
                 params.setMargins(0, marginTop, 0, 0);
                 mToolbar.setLayoutParams(params);
             }
