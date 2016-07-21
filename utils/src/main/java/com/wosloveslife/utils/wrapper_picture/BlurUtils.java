@@ -45,8 +45,8 @@ public class BlurUtils {
         if (scaleFactor <=0){
             scaleFactor = 1;
         }
-        if (radius <= 0){
-            radius = 20;
+        if (radius <= 1){
+            radius = 1;
         }
 
 //        Bitmap overlay = Bitmap.createBitmap((int) (view.getMeasuredWidth() / scaleFactor),

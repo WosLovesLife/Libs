@@ -46,6 +46,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private float mTargetScale;
     private float mBlurRadius;
     private Bitmap mOriginBitmap;
+    private Bitmap mForBlur;
 
     // Widgets
     private AppBarLayout mActionbar;
@@ -57,7 +58,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
 
     // Data
-    private ArrayList<Bitmap> mBlurBgs;
+//    private ArrayList<Bitmap> mBlurBgs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +141,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理Actionbar的联动效果 */
     private void disposeActionbarLinkage(int dy) {
-        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight" + mHeaderHeight);
+//        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight" + mHeaderHeight);
         if (mHeaderHeight == 0) return;
 
         float rate = (dy + 0f) / (mHeaderHeight + 0f);
@@ -220,39 +221,30 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mTY += dy;
 
         /* 为了避免反复的模糊渲染 */
-        if (dy >0 && mTY < 9 ) return;
-        if (dy <0 && mTY > -9) return;
+        if (dy > 0 && mTY < 9) return;
+        if (dy < 0 && mTY > -9) return;
 
         mBlurRadius += (mTY * 0.1f);
         mTY = 0;
 
-        /* 说明还没有进行过模糊处理, 将原图背景存起来 */
-        if (mBlurBgs == null || mBlurBgs.size() < 1) {
-            mBlurBgs = new ArrayList<>();
-            Bitmap origin = mOriginBitmap;
-            origin = ThumbnailUtils.extractThumbnail(origin, (int) (origin.getWidth() / 2f), (int) (origin.getHeight() / 2f));
-            mBlurBgs.add(origin);
+        /* 由于一般原图都比较大,会很占资源,因此生成一个压缩后的图片作为模糊的原始图片 */
+        if (mForBlur == null) {
+            mForBlur = ThumbnailUtils.extractThumbnail(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 2f), (int) (mOriginBitmap.getHeight() / 2f));
         }
+
+        Log.w(TAG, "disposeHeaderBlur: mBlurRadius = " + mBlurRadius);
 
         Bitmap bitmap;
         /* 正数表明当下是向下拉,需要进行模糊处理 */
-        if (dy > 0) {
-           /* 对原图片进行高斯模糊处理 */
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mBlurBgs.get(0), mImageView, 1, mBlurRadius);
-            mBlurBgs.add(bitmap);
+        if (mBlurRadius > 2) {
+            /* 对原图片进行高斯模糊处理 */
+            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 1, mBlurRadius);
         }
         /* 负数说明当前是向上拉,则应该逐渐清晰 */
         else {
-            if (mBlurBgs.size() > 1) {
-                int lastIndex = mBlurBgs.size() - 1;
-                bitmap = mBlurBgs.get(lastIndex);
-                mBlurBgs.remove(lastIndex);
-            } else {
-                bitmap = mOriginBitmap;
-            }
+            bitmap = mOriginBitmap;
         }
 
-//        Log.w(TAG, "disposeHeaderBlur: mBlurBgs.size() = " + mBlurBgs.size());
         mImageView.setImageBitmap(bitmap);
     }
 
@@ -296,11 +288,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     private void toBlurDefault() {
         // 模糊相关的内容恢复
-        if (mBlurBgs != null) {
-            mImageView.setImageBitmap(mOriginBitmap);
-            mBlurBgs.clear();
-            mBlurBgs = null;
-        }
+        mImageView.setImageBitmap(mOriginBitmap);
+        mForBlur = null;
     }
 
     /** 如果页面处于 */
