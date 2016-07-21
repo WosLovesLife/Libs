@@ -64,7 +64,7 @@ public class BlurUtils {
         overlay = FastBlur.doBlur(overlay, (int) radius, true);
 //        view.setBackground(new BitmapDrawable(context.getResources(), overlay));
 
-        Log.w(TAG, "blur: currentTimeMillis: " + (System.currentTimeMillis() - startMs));
+        Log.w(TAG, " makePictureBlur: blur cost time = " + (System.currentTimeMillis() - startMs));
         return overlay;
     }
 }

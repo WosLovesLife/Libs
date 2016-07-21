@@ -37,16 +37,27 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final float DEFAULT_VALUE = -1008611.0f;
     private static final float SCALE_DEFAULT = 1.0f;
-    private static final float SCALE_TARGET = 1.3f;
+    private static final float SCALE_TARGET = 1.4f;
     private static final float SCALE_GROWTH_RATE = 0.001f;
 
     // Variables
-    float mY = DEFAULT_VALUE;
+    /** 手指触摸到的Y坐标 */
+    float mTouchedY = DEFAULT_VALUE;
+    /** HeaderVIew的高度, 联动效果根据该值来作为比例变量的依据 */
     private int mHeaderHeight;
+    /** 预计缩放比 */
     private float mTargetScale;
+    /** 记录预计模糊程度 */
     private float mBlurRadius;
+    /** 该变量记录手指移动的区间阶段, 每增加或减少指定的像素位数以上则变更HeaderView的模糊程度 */
+    float mTY;
+    /** HeaderView的原始图片 */
     private Bitmap mOriginBitmap;
+    /** 该图片用于作为裁剪后的模糊模板,是原始图片的压缩版,所有模糊效果根据该图做处理 */
+    private Bitmap mOriginBlur;
     private Bitmap mForBlur;
+    private Bitmap mForBlur2;
+    private Bitmap mForBlur3;
 
     // Widgets
     private AppBarLayout mActionbar;
@@ -170,14 +181,14 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理HeaderView的联动效果 */
     private boolean disposeHeaderView(MotionEvent event) {
-        if (mY == DEFAULT_VALUE) {
-            mY = event.getY();
+        if (mTouchedY == DEFAULT_VALUE) {
+            mTouchedY = event.getY();
             return false;
         }
 
         float y = event.getY();
-        float dy = y - mY;
-        mY = y;
+        float dy = y - mTouchedY;
+        mTouchedY = y;
 
         float currentScale = mImageView.getScaleX();
 
@@ -190,7 +201,9 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 这里也是为了增加效率避免重复处理，但是它需要返回true 不然会出卡顿的现象 */
         if (currentScale >= SCALE_TARGET && dy > 0f) return true;
 
-        mTargetScale = currentScale + dy * SCALE_GROWTH_RATE;
+        disposeHeaderBlur(dy);
+
+        mTargetScale = currentScale + (dy * SCALE_GROWTH_RATE);
 
         /* 这一重判断是为了快速滑动时move的值比较大时将值设为默认大小 */
         if (mTargetScale > SCALE_TARGET) {
@@ -202,12 +215,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mImageView.setScaleX(mTargetScale);
         mImageView.setScaleY(mTargetScale);
 
-        disposeHeaderBlur(dy);
-
         return true;
     }
-
-    float mTY;
 
     /**
      * 对HeaderView进行模糊处理
@@ -217,28 +226,37 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private void disposeHeaderBlur(float dy) {
         if (dy == 0) return;
 
-        /*  */
         mTY += dy;
+        mBlurRadius += (mTY * 0.02f);
 
         /* 为了避免反复的模糊渲染 */
         if (dy > 0 && mTY < 9) return;
         if (dy < 0 && mTY > -9) return;
 
-        mBlurRadius += (mTY * 0.1f);
         mTY = 0;
 
         /* 由于一般原图都比较大,会很占资源,因此生成一个压缩后的图片作为模糊的原始图片 */
-        if (mForBlur == null) {
-            mForBlur = ThumbnailUtils.extractThumbnail(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 2f), (int) (mOriginBitmap.getHeight() / 2f));
+        if (mForBlur == null && mBlurRadius < 10) {
+            int size = Dp2Px.toPX(getApplicationContext(), 150);
+            mForBlur = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
+            mOriginBlur = mForBlur;
+        }else if (mForBlur2 == null && mBlurRadius <20){
+            int size = Dp2Px.toPX(getApplicationContext(), 100);
+            mForBlur2 = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
+            mOriginBlur = mForBlur2;
+        }else if (mForBlur3 == null){
+            int size = Dp2Px.toPX(getApplicationContext(), 70);
+            mForBlur3 = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
+            mOriginBlur = mForBlur3;
         }
 
         Log.w(TAG, "disposeHeaderBlur: mBlurRadius = " + mBlurRadius);
 
         Bitmap bitmap;
         /* 正数表明当下是向下拉,需要进行模糊处理 */
-        if (mBlurRadius > 2) {
+        if (mBlurRadius > 1) {
             /* 对原图片进行高斯模糊处理 */
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 1, mBlurRadius);
+            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mOriginBlur, mImageView, 1, mBlurRadius);
         }
         /* 负数说明当前是向上拉,则应该逐渐清晰 */
         else {
@@ -282,7 +300,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         } else {
             toBlurDefault();
         }
-        mY = DEFAULT_VALUE;
+        mTouchedY = DEFAULT_VALUE;
         mBlurRadius = 0;
     }
 
@@ -290,6 +308,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         // 模糊相关的内容恢复
         mImageView.setImageBitmap(mOriginBitmap);
         mForBlur = null;
+        mForBlur2 = null;
+        mForBlur3 = null;
     }
 
     /** 如果页面处于 */
