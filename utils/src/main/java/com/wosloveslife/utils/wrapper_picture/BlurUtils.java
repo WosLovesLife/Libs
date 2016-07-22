@@ -40,7 +40,7 @@ public class BlurUtils {
     }
 
     public static Bitmap makePictureBlur(Context context, Bitmap bkg, View view , float scaleFactor, float radius) {
-        long startMs = System.currentTimeMillis();
+//        long startMs = System.currentTimeMillis();
 
         if (scaleFactor <=0){
             scaleFactor = 1;
@@ -49,8 +49,6 @@ public class BlurUtils {
             radius = 1;
         }
 
-//        Bitmap overlay = Bitmap.createBitmap((int) (view.getMeasuredWidth() / scaleFactor),
-//                (int) (view.getMeasuredHeight() / scaleFactor), Bitmap.Config.ARGB_8888);
         Bitmap overlay = Bitmap.createBitmap((int) (bkg.getWidth() / scaleFactor),
                 (int) (bkg.getHeight() / scaleFactor), Bitmap.Config.RGB_565);
 
@@ -62,9 +60,8 @@ public class BlurUtils {
         canvas.drawBitmap(bkg, 0, 0, paint);
 
         overlay = FastBlur.doBlur(overlay, (int) radius, true);
-//        view.setBackground(new BitmapDrawable(context.getResources(), overlay));
 
-        Log.w(TAG, " makePictureBlur: blur cost time = " + (System.currentTimeMillis() - startMs));
+//        Log.w(TAG, " makePictureBlur: blur cost time = " + (System.currentTimeMillis() - startMs));
         return overlay;
     }
 }

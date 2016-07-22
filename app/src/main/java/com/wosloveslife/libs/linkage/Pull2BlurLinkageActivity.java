@@ -3,8 +3,8 @@ package com.wosloveslife.libs.linkage;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -44,7 +44,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     /** 手指触摸到的Y坐标 */
     float mTouchedY = DEFAULT_VALUE;
     /** HeaderVIew的高度, 联动效果根据该值来作为比例变量的依据 */
-    private int mHeaderHeight;
+    private int mHeaderSize;
     /** 预计缩放比 */
     private float mTargetScale;
     /** 记录预计模糊程度 */
@@ -54,11 +54,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     /** HeaderView的原始图片 */
     private Bitmap mOriginBitmap;
     /** 该图片用于作为裁剪后的模糊模板,是原始图片的压缩版,所有模糊效果根据该图做处理 */
-    private Bitmap mOriginBlur;
     private Bitmap mForBlur;
-    private Bitmap mForBlur2;
-    private Bitmap mForBlur3;
-
+    
     // Widgets
     private AppBarLayout mActionbar;
     private ImageView mImageView;
@@ -67,9 +64,6 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     // Controllers
     private BaseRecyclerViewAdapter mAdapter;
     private LinearLayoutManager mLinearLayoutManager;
-
-    // Data
-//    private ArrayList<Bitmap> mBlurBgs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,15 +89,22 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private void initHeaderView() {
         // header
         mImageView = new ImageView(this);
-        mHeaderHeight = Dp2Px.toPX(getApplicationContext(), 200);
+        mHeaderSize = Dp2Px.toPX(getApplicationContext(), 200);
         /* 设置第一个处于顶端的Header的MarinTop为Toolbar的高度,避免被遮挡
          * 因为条目可能获取不到LayoutParams,所以手动设置一个 */
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderHeight);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderSize);
         mImageView.setLayoutParams(params);
-//        mOriginBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.header_bg1);
-        mOriginBitmap = CropPicture.getScaledDrawable(this, R.drawable.header_bg2, Dp2Px.toPX(getApplicationContext(), 200), Dp2Px.toPX(getApplicationContext(), 200)).getBitmap();
-        mImageView.setImageBitmap(mOriginBitmap);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        setHeaderImage(R.drawable.header_bg1);
+    }
+
+    private void setHeaderImage(@DrawableRes int resDrawable) {
+        /* 以压缩的方式读入内存 */
+        mOriginBitmap = CropPicture.getScaledDrawable(this, resDrawable, mHeaderSize, mHeaderSize).getBitmap();
+        /* 将作为模糊参照的图片按原图的一半大小进行处理 */
+        mForBlur = CropPicture.getScaledDrawable(this, resDrawable, (int) (mHeaderSize * 0.5), (int) (mHeaderSize * 0.5), Bitmap.Config.RGB_565).getBitmap();
+        Log.w(TAG, "setHeaderImage: mOriginBitmap.getByteCount() = " + mOriginBitmap.getByteCount());
+        mImageView.setImageBitmap(mOriginBitmap);
     }
 
     /** 获取模拟数据 */
@@ -152,10 +153,10 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理Actionbar的联动效果 */
     private void disposeActionbarLinkage(int dy) {
-//        Log.w(TAG, "disposeActionbarLinkage: mHeaderHeight" + mHeaderHeight);
-        if (mHeaderHeight == 0) return;
+//        Log.w(TAG, "disposeActionbarLinkage: mHeaderSize" + mHeaderSize);
+        if (mHeaderSize == 0) return;
 
-        float rate = (dy + 0f) / (mHeaderHeight + 0f);
+        float rate = (dy + 0f) / (mHeaderSize + 0f);
 
         if (mLinearLayoutManager.findFirstVisibleItemPosition() > 0f && rate < 0f) return;
 
@@ -181,6 +182,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
     /** 处理HeaderView的联动效果 */
     private boolean disposeHeaderView(MotionEvent event) {
+        long millis = System.currentTimeMillis();
+
         if (mTouchedY == DEFAULT_VALUE) {
             mTouchedY = event.getY();
             return false;
@@ -201,6 +204,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 这里也是为了增加效率避免重复处理，但是它需要返回true 不然会出卡顿的现象 */
         if (currentScale >= SCALE_TARGET && dy > 0f) return true;
 
+        /* 处理模糊操作 */
         disposeHeaderBlur(dy);
 
         mTargetScale = currentScale + (dy * SCALE_GROWTH_RATE);
@@ -215,6 +219,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mImageView.setScaleX(mTargetScale);
         mImageView.setScaleY(mTargetScale);
 
+        Log.w(TAG, "disposeHeaderView: disposeHeaderView cost time = " + (System.currentTimeMillis() - millis));
         return true;
     }
 
@@ -227,40 +232,26 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         if (dy == 0) return;
 
         mTY += dy;
-        mBlurRadius += (mTY * 0.02f);
+        /* mBlurRadius同时起到记录手指未抬起前移动的Y轴距离. 当它的值大于0时表示HeaderView完全可见
+         * 这里用这个值作为是否要将图片置为原始图片的判断依据 */
+        mBlurRadius += (dy * 0.02f);
 
         /* 为了避免反复的模糊渲染 */
-        if (dy > 0 && mTY < 9) return;
-        if (dy < 0 && mTY > -9) return;
-
+        if (dy > 0 && mTY < 1) return;
+        if (dy < 0 && mTY > -1) return;
         mTY = 0;
-
-        /* 由于一般原图都比较大,会很占资源,因此生成一个压缩后的图片作为模糊的原始图片 */
-        if (mForBlur == null && mBlurRadius < 10) {
-            int size = Dp2Px.toPX(getApplicationContext(), 150);
-            mForBlur = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
-            mOriginBlur = mForBlur;
-        }else if (mForBlur2 == null && mBlurRadius <20){
-            int size = Dp2Px.toPX(getApplicationContext(), 100);
-            mForBlur2 = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
-            mOriginBlur = mForBlur2;
-        }else if (mForBlur3 == null){
-            int size = Dp2Px.toPX(getApplicationContext(), 70);
-            mForBlur3 = ThumbnailUtils.extractThumbnail(mOriginBitmap, size, size);
-            mOriginBlur = mForBlur3;
-        }
 
         Log.w(TAG, "disposeHeaderBlur: mBlurRadius = " + mBlurRadius);
 
         Bitmap bitmap;
-        /* 正数表明当下是向下拉,需要进行模糊处理 */
-        if (mBlurRadius > 1) {
-            /* 对原图片进行高斯模糊处理 */
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mOriginBlur, mImageView, 1, mBlurRadius);
-        }
-        /* 负数说明当前是向上拉,则应该逐渐清晰 */
-        else {
+        /* dy作为判断方向的依据(上拉还是下拉),如果上拉并且模糊值<1就设置成原图 */
+        if (mBlurRadius < 1 && dy < 0) {
             bitmap = mOriginBitmap;
+        }
+        /* 表明HeaderView完全可见并且当前正在下拉,需要进行模糊处理 */
+        else {
+            /* 对原图片进行高斯模糊处理 */
+            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 1, mBlurRadius);
         }
 
         mImageView.setImageBitmap(bitmap);
@@ -307,9 +298,6 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private void toBlurDefault() {
         // 模糊相关的内容恢复
         mImageView.setImageBitmap(mOriginBitmap);
-        mForBlur = null;
-        mForBlur2 = null;
-        mForBlur3 = null;
     }
 
     /** 如果页面处于 */

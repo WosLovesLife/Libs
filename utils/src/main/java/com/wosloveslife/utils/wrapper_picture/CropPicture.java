@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -67,8 +68,12 @@ public class CropPicture {
     }
 
     public static BitmapDrawable getScaledDrawable(Context context, @DrawableRes int resId, int destWidth, int destHeight) {
-        if (destWidth < 0) destWidth = 0;
-        if (destHeight < 0) destHeight = 0;
+        return getScaledDrawable(context,resId,destWidth,destHeight, Bitmap.Config.ARGB_8888);
+    }
+
+    public static BitmapDrawable getScaledDrawable(Context context, @DrawableRes int resId, int destWidth, int destHeight, Bitmap.Config Mode) {
+        if (destWidth < 1) destWidth = 1;
+        if (destHeight < 1) destHeight = 1;
 
         /* 获取只截取边缘的Option */
         BitmapFactory.Options options = getBoundOption();
@@ -80,9 +85,21 @@ public class CropPicture {
         int inSampleSize = getSampleSize(destWidth, destHeight, options);
 
         options = getScaledOptions(inSampleSize);
+        options.inPreferredConfig = Mode;
 
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId, options);
         return new BitmapDrawable(context.getResources(), bitmap);
+    }
+
+    public static Bitmap getScaledBitmap(Bitmap origin, int destWidth, int destHeight){
+        if (destWidth < 1) destWidth = 1;
+        if (destHeight < 1) destHeight = 1;
+
+        int inSampleSize = getSampleSize(destWidth, destHeight, origin.getWidth(), origin.getHeight());
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(inSampleSize,inSampleSize); //长和宽放大缩小的比例
+        return Bitmap.createBitmap(origin,0,0,origin.getWidth(),origin.getHeight(),matrix,true);
     }
 
     @NonNull
@@ -98,6 +115,11 @@ public class CropPicture {
     /* 通过配置器获取到图片的宽高 */
         float srcWidth = options.outWidth;  //图片宽
         float srcHeight = options.outHeight;//图片高
+
+        return getSampleSize(destWidth,destHeight,srcWidth,srcHeight);
+    }
+
+    private static int getSampleSize(float destWidth, float destHeight, float srcWidth, float srcHeight) {
         int inSampleSize = 1;   //默认的缩放比例
         /* 如果资源位图的高或者宽大于屏幕 */
         if (srcHeight > destHeight || srcWidth > destHeight) {
