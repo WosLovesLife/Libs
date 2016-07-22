@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -55,7 +56,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private Bitmap mOriginBitmap;
     /** 该图片用于作为裁剪后的模糊模板,是原始图片的压缩版,所有模糊效果根据该图做处理 */
     private Bitmap mForBlur;
-    
+
     // Widgets
     private AppBarLayout mActionbar;
     private ImageView mImageView;
@@ -95,15 +96,23 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderSize);
         mImageView.setLayoutParams(params);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        setHeaderImage(R.drawable.header_bg1);
+        setHeaderImage(R.drawable.header_bg);
     }
 
-    private void setHeaderImage(@DrawableRes int resDrawable) {
+    private void setHeaderImage(@DrawableRes int resId) {
+
+        Display display = getWindowManager().getDefaultDisplay();
+        int displayWidth = display.getWidth();
+
         /* 以压缩的方式读入内存 */
-        mOriginBitmap = CropPicture.getScaledDrawable(this, resDrawable, mHeaderSize, mHeaderSize).getBitmap();
+        mOriginBitmap = CropPicture.getScaledDrawable(this, resId, displayWidth, mHeaderSize, Bitmap.Config.RGB_565).getBitmap();
+
+        /* 裁剪掉图片多余看不到的地方 */
+        mOriginBitmap = CropPicture.ImageCrop(mOriginBitmap, displayWidth, mHeaderSize);
+
         /* 将作为模糊参照的图片按原图的一半大小进行处理 */
-        mForBlur = CropPicture.getScaledDrawable(this, resDrawable, (int) (mHeaderSize * 0.5), (int) (mHeaderSize * 0.5), Bitmap.Config.RGB_565).getBitmap();
-        Log.w(TAG, "setHeaderImage: mOriginBitmap.getByteCount() = " + mOriginBitmap.getByteCount());
+        mForBlur = CropPicture.getScaledBitmap(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 1.5), (int) (mOriginBitmap.getHeight() / 1.5), Bitmap.Config.RGB_565);
+        Log.w(TAG, "setHeaderImage: mOriginBitmap.getByteCount() = " + mOriginBitmap.getByteCount() + "; mForBlur.getByteCount() = " + mForBlur.getByteCount());
         mImageView.setImageBitmap(mOriginBitmap);
     }
 
@@ -234,7 +243,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mTY += dy;
         /* mBlurRadius同时起到记录手指未抬起前移动的Y轴距离. 当它的值大于0时表示HeaderView完全可见
          * 这里用这个值作为是否要将图片置为原始图片的判断依据 */
-        mBlurRadius += (dy * 0.02f);
+        mBlurRadius += (dy * 0.01f);
 
         /* 为了避免反复的模糊渲染 */
         if (dy > 0 && mTY < 1) return;
@@ -251,9 +260,10 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 表明HeaderView完全可见并且当前正在下拉,需要进行模糊处理 */
         else {
             /* 对原图片进行高斯模糊处理 */
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 1, mBlurRadius);
+            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 2, mBlurRadius);
         }
 
+//        Log.w(TAG, "disposeHeaderBlur: mBlurBgs.size() = " + mBlurBgs.size());
         mImageView.setImageBitmap(bitmap);
     }
 
