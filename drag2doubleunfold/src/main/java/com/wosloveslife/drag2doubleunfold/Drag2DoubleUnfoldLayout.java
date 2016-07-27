@@ -49,7 +49,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
     private int mStep1;
     /** 为true时,Form==FORM_FOLD则自动隐藏此控件 */
     private boolean mAutoDismiss;
-    /** 为true时,可以从底边边缘滑出窗体 */
+    /** 为true时,可以从底边边缘滑出窗体, 默认为true */
     private boolean mEdgeTrackingEnabled;
     /** 判断是否为第一次初始化控件 */
     private boolean mFirstInit = true;
@@ -60,6 +60,8 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
     float mVelocityY;
     /** 滑动控件距离本控件Top的距离 */
     int mTop;
+    /** Y轴移动的距离,用来判断方向和距离 */
+    private int mDy;
     /** 本控件的高度 */
     private int mHeight;
     /** 记录部分展开的位置 */
@@ -93,7 +95,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
 
     private void init() {
 
-        /* 设置中间层背景半透明层 让背景颜色随着滑动控件的展开而透明度加深 */
+        /* 中间背景设置为透明, 当第一次初始化结束后更改背景为半透明 */
         setBackgroundResource(android.R.color.transparent);
         mBackground = getBackground();
     }
@@ -102,8 +104,21 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                Log.w(TAG, "onFling: velocityY = " + velocityY);
                 mVelocityY = velocityY;
                 return super.onFling(e1, e2, velocityX, velocityY);
+            }
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                if (mCurrentForm == FORM_PART) {
+                    float y = e.getY();
+                    if (y < mPartPoint.y) {
+                        Log.w(TAG, "onDown: 点击了空白区域");
+                        controlForm(FORM_FOLD);
+                    }
+                }
+                return super.onDown(e);
             }
         });
     }
@@ -135,6 +150,14 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
             public int clampViewPositionVertical(View child, int top, int dy) {
                 final int topBound = getPaddingTop();
                 final int bottomBound = getHeight() - topBound;
+
+                /* 当滑动到部分展开形态,在继续向下滑则速度减慢 */
+                if (top > mPartPoint.y && dy > 0) {
+                    top -= dy * 0.7;
+                }
+                mVelocityY = 0;
+                mDy += dy;
+
                 return Math.min(Math.max(top, topBound), bottomBound);
             }
 
@@ -152,12 +175,11 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
             @Override
             public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
                 super.onViewPositionChanged(changedView, left, top, dx, dy);
-//                Log.w(TAG, "onViewPositionChanged: left = " + left + "; top = " + top + "; dx = " + dx + "; dy = " + dy);
                 if (changedView == mChildLayout) {
                     mTop = top;
                     if (mTop != 0) {
                         int alpha = (int) (255 - 255 * ((mTop + 0.0f) / mHeight));
-                        Log.w(TAG, "onViewPositionChanged: top = " + top + "; alpha = " + alpha);
+//                        Log.w(TAG, "onViewPositionChanged: top = " + top + "; alpha = " + alpha);
                         mBackground.setAlpha(alpha);
                     }
                 }
@@ -167,6 +189,12 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
                     clearAnimation();
                     mChildLayout.clearAnimation();
                     setVisibility(GONE);
+
+                    if (mOnFormChangeListeners != null) {
+                        for (OnFormChangeListener l : mOnFormChangeListeners) {
+                            l.onDismiss();
+                        }
+                    }
                 }
             }
 
@@ -180,6 +208,9 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
                 Log.w(TAG, "onEdgeDragStarted: ");
             }
         });
+
+        /* 默认开启边缘滑动 */
+        setEdgeTrackingEnabled(true);
     }
 
     /** 处理滑动相关事件，根据速度和位置展开或收起滑动控件 */
@@ -198,16 +229,13 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         }
         /* 移动范围在高度一半以下，则可能的形态为部分展开或完全收起 */
         else {
-            if (mVelocityY < -SLIDE_SENSITIVITY) {
+            if (mVelocityY < -SLIDE_SENSITIVITY || mDy < -20) {
                 mCurrentForm = FORM_PART;
-            } else if (mVelocityY > SLIDE_SENSITIVITY) {
-                mCurrentForm = FORM_FOLD;
-            } else if (mTop < (mHeight - mStep1) / 2) {
-                mCurrentForm = FORM_PART;
-            } else {
+            } else if (mVelocityY > SLIDE_SENSITIVITY || mDy > 20) {
                 mCurrentForm = FORM_FOLD;
             }
         }
+        mDy = 0;
 
         /* 平滑展开或收起 */
         if (mCurrentForm == FORM_PART) {
@@ -266,18 +294,18 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         scroll(FORM_FOLD);
     }
 
-
     @Override
     public void computeScroll() {
         super.computeScroll();
-        Log.w(TAG, "computeScroll: " );
 
         if (mDragHelper.continueSettling(true)) {
-
             invalidate();
-        }else if (mDragHelper.getViewDragState() == ViewDragHelper.STATE_IDLE && mFirstInit){
-            Log.w(TAG, "computeScroll: mFirstInit = false" );
+        }
+        /** 等待第一次初始化时将滑动控件滑动到最下面, 当满足该条件表明已经完成滑动,则变换设定 */
+        else if (mDragHelper.getViewDragState() == ViewDragHelper.STATE_IDLE && mFirstInit) {
+            Log.w(TAG, "computeScroll: mFirstInit = false");
             mFirstInit = false;
+            /* 设置中间层背景半透明层 让背景颜色随着滑动控件的展开而透明度加深 */
             setBackgroundColor(Color.parseColor("#28292b2b"));
             mBackground.setAlpha(0);
             mChildLayout.setVisibility(VISIBLE);
@@ -294,7 +322,10 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
      * @see #FORM_FOLD 完全收起
      */
     public void controlForm(int form) {
-        setVisibility(VISIBLE);
+        if (getVisibility() == GONE || getVisibility() == INVISIBLE) {
+            setVisibility(VISIBLE);
+        }
+
         Log.w(TAG, "controlSpread: form = " + form + "; mTop = " + mTop);
         switch (form) {
             case FORM_PART:
@@ -312,6 +343,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         }
     }
 
+    /** 只负责滑动,不管控件是否可见 */
     private void scroll(int form) {
         switch (form) {
             case FORM_PART:
@@ -327,6 +359,17 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         invalidate();
     }
 
+    public void show() {
+        if (mCurrentForm == FORM_FOLD) {
+            controlForm(FORM_PART);
+        }
+    }
+
+    public void dismiss() {
+        setAutoDismissEnable(true);
+        controlForm(FORM_FOLD);
+    }
+
     /** 获取当前形态 */
     public int getForm() {
         return mCurrentForm;
@@ -340,15 +383,17 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         }
     }
 
-    /** 设置 */
+    /** 获取当前是否启用了底边边缘滑动,默认为true */
     public boolean getEdgeTrackingEnabled() {
         return mEdgeTrackingEnabled;
     }
 
+    /** 设置当滑动控件完全收起时是否将本控件置为不可见(GONE) */
     public void setAutoDismissEnable(boolean autoDismiss) {
         mAutoDismiss = autoDismiss;
     }
 
+    /** 获取当前是否滑动控件完全收起时本控件将不可见(GONE) */
     public boolean getAutoDismissEnable() {
         return mAutoDismiss;
     }
@@ -356,13 +401,17 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
     // 对外提供事件监听
     public interface OnFormChangeListener {
         void onSlide(int form);
+
+        void onDismiss();
     }
 
+    /** 增加对形态改变事件的监听 */
     public void addOnFormChangeListener(OnFormChangeListener onFormChangeListener) {
         if (onFormChangeListener != null)
             mOnFormChangeListeners.add(onFormChangeListener);
     }
 
+    /** 移出对形态改变事件的监听 */
     public void removeOnFormChangeListener(OnFormChangeListener onFormChangeListener) {
         mOnFormChangeListeners.remove(onFormChangeListener);
     }

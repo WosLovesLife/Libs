@@ -2,6 +2,7 @@ package com.wosloveslife.libs;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -10,8 +11,8 @@ import android.widget.Toast;
 
 import com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout;
 
-
 public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
+    private static final String TAG = "Drag2DoubleUnfold";
 
     private Drag2DoubleUnfoldLayout mDrag2DoubleUnfoldLayout;
 
@@ -21,12 +22,19 @@ public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
         setContentView(R.layout.activity_drag_2_double_unfold);
 
         mDrag2DoubleUnfoldLayout = (Drag2DoubleUnfoldLayout) findViewById(R.id.id_sdl_spread);
-        mDrag2DoubleUnfoldLayout.setEdgeTrackingEnabled(true);
+//        mDrag2DoubleUnfoldLayout.setEdgeTrackingEnabled(true);
         mDrag2DoubleUnfoldLayout.addOnFormChangeListener(new Drag2DoubleUnfoldLayout.OnFormChangeListener() {
             @Override
             public void onSlide(int form) {
+                Log.w(TAG, "onSlide: form = "+form );
+            }
+
+            @Override
+            public void onDismiss() {
+                Log.w(TAG, "onDismiss: " );
             }
         });
+        mDrag2DoubleUnfoldLayout.controlForm(Drag2DoubleUnfoldLayout.FORM_PART);
 
         Button changeForm = (Button) findViewById(R.id.id_btn_change);
         changeForm.setOnClickListener(new View.OnClickListener() {
@@ -73,12 +81,5 @@ public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
                 Toast.makeText(Drag2DoubleUnfoldActivity.this, "test", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        mDrag2DoubleUnfoldLayout.controlForm(Drag2DoubleUnfoldLayout.FORM_PART);
     }
 }
