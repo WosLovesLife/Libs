@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -10,43 +10,62 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
         <android.support.v7.widget.Toolbar
-            app:title="Libs库 示例"
             android:id="@+id/id_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@android:style/Widget.Holo.Light.ActionButton.Overflow">
+            app:theme="@android:style/Widget.Holo.Light.ActionButton.Overflow"
+            app:title="Libs库 示例">
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:id="@+id/id_btn_loop_view"
+    <ScrollView
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="LoopView示例"/>
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/id_btn_header_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="BaseRecyclerView示例"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/id_btn_clip_photo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="GetAndClipPhoto示例"/>
+            <Button
+                android:id="@+id/id_btn_loop_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="LoopView示例"/>
 
-    <Button
-        android:id="@+id/id_btn_gallery"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="GalleryViewPager示例"/>
+            <Button
+                android:id="@+id/id_btn_header_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BaseRecyclerView示例"/>
 
-    <Button
-        android:id="@+id/id_btn_linkage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Linkage联动效果示例"/>
-</LinearLayout>
+            <Button
+                android:id="@+id/id_btn_clip_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GetAndClipPhoto示例"/>
+
+            <Button
+                android:id="@+id/id_btn_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GalleryViewPager示例"/>
+
+            <Button
+                android:id="@+id/id_btn_linkage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Linkage联动效果示例"/>
+
+            <Button
+                android:id="@+id/id_btn_drag_unfold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Drag2DoubleUnfold联动效果示例"/>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
