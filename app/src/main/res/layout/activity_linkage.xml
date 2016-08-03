@@ -23,12 +23,16 @@
 
     <Button
         android:id="@+id/id_btn_effect_enter_always"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:textColor="@color/accent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="enter_always效果"/>
 
     <Button
         android:id="@+id/id_btn_effect_pull_to_blur"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:textColor="@color/accent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="pull_to_blur效果"/>

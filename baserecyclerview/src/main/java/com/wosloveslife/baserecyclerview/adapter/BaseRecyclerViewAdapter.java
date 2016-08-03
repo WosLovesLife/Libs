@@ -1,7 +1,6 @@
 package com.wosloveslife.baserecyclerview.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,26 +45,11 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
     /** 在该方法中对不同的条目类型进行区分, 并算出每种类型对应的数据数据position */
     @Override
     public void onBindViewHolder(BaseRecyclerViewHolder<T> holder, int position) {
-        if (mTypeCount > 0) {
-            Log.w(TAG, "onBindViewHolder: position = " + position);
-            if (position < mTypeCount) {
-                /* 已废除 */
-//                onBindHeaderViewHolder(holder, position);
-            } else {
-                onBindItemViewHolder(holder, position - mTypeCount);
-            }
-        } else {
-            onBindItemViewHolder(holder, position);
-        }
+        /* 说明这是一个Header条目 不需要绑定数据 */
+        if (position < mTypeCount) return;
+
+        holder.onBind(mData.get(getDataPosition(position)));
     }
-
-    /** 已废除.  实现该方法, 绑定Header条目的ViewHolder时调用 */
-//    protected abstract void _onBindHeaderViewHolder(BaseRecyclerViewHolder holder, int position);
-
-    /** 实现该方法, 绑定普通条目的ViewHolder时调用 */
-    protected void onBindItemViewHolder(BaseRecyclerViewHolder<T> holder, int position){
-        holder.onBind(mData.get(position));
-    };
 
     @Override
     public int getItemCount() {
@@ -97,7 +81,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
     }
 
     /** 实现BaseRecyclerViewHolder 添加头部的View. 后添加的出现在最上面. */
-    public void _addHeader(BaseRecyclerViewHolder headerViewHolder) {
+    public void _addHeader(BaseRecyclerViewHolder<T> headerViewHolder) {
         mHeaderViewHolders.add(0, headerViewHolder);
 
         notifyItemChanged(0);
@@ -105,13 +89,30 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
 
     /** 添加头部的View. 后添加的出现在最上面. */
     public void addHeader(View headerView) {
-        BaseRecyclerViewHolder viewHolder = new BaseRecyclerViewHolder(headerView) {
+        BaseRecyclerViewHolder<T> viewHolder = new BaseRecyclerViewHolder<T>(headerView) {
             @Override
-            public void onBind(Object data) {
+            public void onBind(T data) {
             }
         };
         mHeaderViewHolders.add(0, viewHolder);
 
         notifyItemChanged(0);
+    }
+
+    public int getDataPosition(int oldPosition) {
+        int newPosition;
+        /* 有header则position要减去header的个数 */
+        if (mTypeCount > 0) {
+            newPosition = oldPosition - mTypeCount;
+        } else {
+            newPosition = oldPosition;
+        }
+        return newPosition;
+    }
+
+    public T getData(int position) {
+        if (position >= mData.size()) return null;
+
+        return mData.get(position);
     }
 }

@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,8 +40,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final float DEFAULT_VALUE = -1008611.0f;
     private static final float SCALE_DEFAULT = 1.0f;
-    private static final float SCALE_TARGET = 1.4f;
-    private static final float SCALE_GROWTH_RATE = 0.001f;
+    private static final float SCALE_TARGET = 1.3f;
+    private static final float SCALE_GROWTH_RATE = 0.0003f;
 
     // Variables
     /** 手指触摸到的Y坐标 */
@@ -96,7 +98,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderSize);
         mImageView.setLayoutParams(params);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        setHeaderImage(R.drawable.header_bg);
+        setHeaderImage(R.drawable.bg4);
     }
 
     private void setHeaderImage(@DrawableRes int resId) {
@@ -111,7 +113,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mOriginBitmap = CropPicture.ImageCrop(mOriginBitmap, displayWidth, mHeaderSize);
 
         /* 将作为模糊参照的图片按原图的一半大小进行处理 */
-        mForBlur = CropPicture.getScaledBitmap(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 1.5), (int) (mOriginBitmap.getHeight() / 1.5), Bitmap.Config.RGB_565);
+        mForBlur = CropPicture.getScaledBitmap(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 1.5), (int) (mOriginBitmap.getHeight() / 1.5), Bitmap.Config.ARGB_8888);
+//        mForBlur = mOriginBitmap.copy(Bitmap.Config.ARGB_8888,true);
         Log.w(TAG, "setHeaderImage: mOriginBitmap.getByteCount() = " + mOriginBitmap.getByteCount() + "; mForBlur.getByteCount() = " + mForBlur.getByteCount());
         mImageView.setImageBitmap(mOriginBitmap);
     }
@@ -132,7 +135,14 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         mAdapter = new MyRecyclerViewAdapter(getData());
-        mAdapter.addHeader(mImageView);
+
+        FrameLayout headerContainer = new FrameLayout(this);
+        headerContainer.addView(mImageView);
+        ViewGroup.LayoutParams layoutParams = mRecyclerView.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        headerContainer.setLayoutParams(layoutParams);
+        mAdapter.addHeader(headerContainer);
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -213,9 +223,6 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 这里也是为了增加效率避免重复处理，但是它需要返回true 不然会出卡顿的现象 */
         if (currentScale >= SCALE_TARGET && dy > 0f) return true;
 
-        /* 处理模糊操作 */
-        disposeHeaderBlur(dy);
-
         mTargetScale = currentScale + (dy * SCALE_GROWTH_RATE);
 
         /* 这一重判断是为了快速滑动时move的值比较大时将值设为默认大小 */
@@ -227,6 +234,14 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
         mImageView.setScaleX(mTargetScale);
         mImageView.setScaleY(mTargetScale);
+
+        /* 同步改变高度 */
+        ViewGroup.LayoutParams layoutParams = mImageView.getLayoutParams();
+        layoutParams.height = (int) ((mTargetScale + mTargetScale - SCALE_DEFAULT) * mHeaderSize);
+        mImageView.setLayoutParams(layoutParams);
+
+        /* 处理模糊操作 */
+        disposeHeaderBlur(dy);
 
         Log.w(TAG, "disposeHeaderView: disposeHeaderView cost time = " + (System.currentTimeMillis() - millis));
         return true;
@@ -243,7 +258,8 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mTY += dy;
         /* mBlurRadius同时起到记录手指未抬起前移动的Y轴距离. 当它的值大于0时表示HeaderView完全可见
          * 这里用这个值作为是否要将图片置为原始图片的判断依据 */
-        mBlurRadius += (dy * 0.01f);
+//        mBlurRadius += (dy * 0.01f);
+        mBlurRadius = 15 * ((mTargetScale - SCALE_DEFAULT) / (SCALE_TARGET - SCALE_DEFAULT));
 
         /* 为了避免反复的模糊渲染 */
         if (dy > 0 && mTY < 1) return;
@@ -297,12 +313,27 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
                 }
             });
 
+            new Handler().postDelayed(this::toHeightDefault, 10);
+
             mTargetScale = SCALE_DEFAULT;
         } else {
             toBlurDefault();
         }
         mTouchedY = DEFAULT_VALUE;
         mBlurRadius = 0;
+    }
+
+    private void toHeightDefault() {
+        if (mImageView.getHeight() <= mHeaderSize) return;
+
+        ViewGroup.LayoutParams layoutParams = mImageView.getLayoutParams();
+        layoutParams.height -= mHeaderSize / 22;
+        if (layoutParams.height <= mHeaderSize) {
+            layoutParams.height = mHeaderSize;
+        }
+
+        mImageView.setLayoutParams(layoutParams);
+        new Handler().postDelayed(this::toHeightDefault, 15);
     }
 
     private void toBlurDefault() {

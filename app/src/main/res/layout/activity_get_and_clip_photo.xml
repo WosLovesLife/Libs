@@ -24,23 +24,31 @@
 
             <Button
                 android:id="@+id/id_btn_get_photo_from_album"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="从相册获取图片并剪裁"/>
 
             <Button
                 android:id="@+id/id_btn_get_big_photo_from_album"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="从相册获取大图片并剪裁"/>
 
             <Button
                 android:id="@+id/id_btn_get_custom_photo_from_album"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="从相册获取制定大小图片并剪裁"/>
             <Button
                 android:id="@+id/id_btn_get_photo_from_camera"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="从相机获取图片并剪裁"/>

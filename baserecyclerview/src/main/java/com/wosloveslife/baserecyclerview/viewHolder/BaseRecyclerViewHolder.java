@@ -1,5 +1,6 @@
 package com.wosloveslife.baserecyclerview.viewHolder;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -13,10 +14,15 @@ public abstract class BaseRecyclerViewHolder<T> extends RecyclerView.ViewHolder 
         super(itemView);
 
         onCreateView(itemView);
+
     }
 
     public void onCreateView(View view){
     }
 
     public abstract void onBind(T data);
+
+    public Context getContext(){
+        return itemView.getContext();
+    }
 }

@@ -22,10 +22,9 @@
     </android.support.design.widget.AppBarLayout>
 
     <ScrollView
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
-        android:background="#000"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,39 +33,52 @@
 
             <Button
                 android:id="@+id/id_btn_loop_view"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="LoopView示例"/>
 
             <Button
                 android:id="@+id/id_btn_header_recycler_view"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="BaseRecyclerView示例"/>
 
             <Button
                 android:id="@+id/id_btn_clip_photo"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="GetAndClipPhoto示例"/>
 
             <Button
                 android:id="@+id/id_btn_gallery"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="GalleryViewPager示例"/>
 
             <Button
                 android:id="@+id/id_btn_linkage"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Linkage联动效果示例"/>
 
             <Button
                 android:id="@+id/id_btn_drag_unfold"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Drag2DoubleUnfold联动效果示例"/>
+                android:text="Drag2DoubleUnfold联动效果示例"
+                />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

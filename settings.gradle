@@ -1,1 +1,1 @@
-include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager', ':utils', ':drag2doubleunfold'
+include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager', ':utils', ':drag2doubleunfold', ':blurlibrary', ':lubanlibrary'

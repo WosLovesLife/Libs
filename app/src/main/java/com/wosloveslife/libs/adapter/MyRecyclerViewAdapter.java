@@ -28,9 +28,4 @@ public class MyRecyclerViewAdapter extends BaseRecyclerViewAdapter {
         textView.setLayoutParams(params);
         return new HeaderRecyclerViewHolder(textView);
     }
-
-    @Override
-    protected void onBindItemViewHolder(BaseRecyclerViewHolder holder, int position) {
-        holder.onBind(mData.get(position));
-    }
 }
