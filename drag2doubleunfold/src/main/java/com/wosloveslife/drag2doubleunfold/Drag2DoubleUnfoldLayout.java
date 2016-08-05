@@ -209,8 +209,8 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
             }
         });
 
-        /* 默认开启边缘滑动 */
-        setEdgeTrackingEnabled(true);
+        /* 默认收起时控件为GONE */
+        setAutoDismissEnable(true);
     }
 
     /** 处理滑动相关事件，根据速度和位置展开或收起滑动控件 */
@@ -313,8 +313,23 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         }
     }
 
-    // 对外提供控制方法
+    /** 只负责滑动,不管控件是否可见 */
+    private void scroll(int form) {
+        switch (form) {
+            case FORM_PART:
+                mDragHelper.smoothSlideViewTo(mChildLayout, mPartPoint.x, mPartPoint.y);
+                break;
+            case FORM_COMP:
+                mDragHelper.smoothSlideViewTo(mChildLayout, mCompPoint.x, mCompPoint.y);
+                break;
+            case FORM_FOLD:
+                mDragHelper.smoothSlideViewTo(mChildLayout, mFoldPoint.x, mFoldPoint.y);
+                break;
+        }
+        invalidate();
+    }
 
+    // 对外提供控制方法
     /**
      * @param form 改变滑动控件的形态
      * @see #FORM_PART 展开部分
@@ -341,22 +356,6 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         if (!mFirstInit) {
             scroll(form);
         }
-    }
-
-    /** 只负责滑动,不管控件是否可见 */
-    private void scroll(int form) {
-        switch (form) {
-            case FORM_PART:
-                mDragHelper.smoothSlideViewTo(mChildLayout, mPartPoint.x, mPartPoint.y);
-                break;
-            case FORM_COMP:
-                mDragHelper.smoothSlideViewTo(mChildLayout, mCompPoint.x, mCompPoint.y);
-                break;
-            case FORM_FOLD:
-                mDragHelper.smoothSlideViewTo(mChildLayout, mFoldPoint.x, mFoldPoint.y);
-                break;
-        }
-        invalidate();
     }
 
     public void show() {
