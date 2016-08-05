@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -24,7 +23,7 @@ import com.wosloveslife.baserecyclerview.adapter.BaseRecyclerViewAdapter;
 import com.wosloveslife.libs.R;
 import com.wosloveslife.libs.adapter.MyRecyclerViewAdapter;
 import com.wosloveslife.utils.Dp2Px;
-import com.wosloveslife.utils.wrapper_picture.BlurUtils;
+import com.wosloveslife.utils.stackblur_java.StackBlurManager;
 import com.wosloveslife.utils.wrapper_picture.CropPicture;
 
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     private static final float DEFAULT_VALUE = -1008611.0f;
     private static final float SCALE_DEFAULT = 1.0f;
     private static final float SCALE_TARGET = 1.3f;
-    private static final float SCALE_GROWTH_RATE = 0.0003f;
+    private static final float SCALE_GROWTH_RATE = 0.001f;
 
     // Variables
     /** 手指触摸到的Y坐标 */
@@ -67,6 +66,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
     // Controllers
     private BaseRecyclerViewAdapter mAdapter;
     private LinearLayoutManager mLinearLayoutManager;
+    private StackBlurManager mStackBlurManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderSize);
         mImageView.setLayoutParams(params);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        setHeaderImage(R.drawable.bg4);
+        setHeaderImage(R.drawable.bg2);
     }
 
     private void setHeaderImage(@DrawableRes int resId) {
@@ -113,9 +113,12 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mOriginBitmap = CropPicture.ImageCrop(mOriginBitmap, displayWidth, mHeaderSize);
 
         /* 将作为模糊参照的图片按原图的一半大小进行处理 */
-        mForBlur = CropPicture.getScaledBitmap(mOriginBitmap, (int) (mOriginBitmap.getWidth() / 1.5), (int) (mOriginBitmap.getHeight() / 1.5), Bitmap.Config.ARGB_8888);
-//        mForBlur = mOriginBitmap.copy(Bitmap.Config.ARGB_8888,true);
+        mForBlur = CropPicture.getScaledBitmap(mOriginBitmap, (mOriginBitmap.getWidth() / 5), (mOriginBitmap.getHeight() / 5), Bitmap.Config.ARGB_8888);
         Log.w(TAG, "setHeaderImage: mOriginBitmap.getByteCount() = " + mOriginBitmap.getByteCount() + "; mForBlur.getByteCount() = " + mForBlur.getByteCount());
+
+        /* 将这种用于处理模糊的Bitmap交给StackBlurManager托管 */
+        mStackBlurManager = new StackBlurManager(mForBlur);
+
         mImageView.setImageBitmap(mOriginBitmap);
     }
 
@@ -154,25 +157,21 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
             }
         });
 
-        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_MOVE:
-                        return disposeHeaderView(event);
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        toDefault();
+        mRecyclerView.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_MOVE:
+                    return disposeHeaderView(event);
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    toDefault();
 
-                }
-                return false;
             }
+            return false;
         });
     }
 
     /** 处理Actionbar的联动效果 */
     private void disposeActionbarLinkage(int dy) {
-//        Log.w(TAG, "disposeActionbarLinkage: mHeaderSize" + mHeaderSize);
         if (mHeaderSize == 0) return;
 
         float rate = (dy + 0f) / (mHeaderSize + 0f);
@@ -240,10 +239,13 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         layoutParams.height = (int) ((mTargetScale + mTargetScale - SCALE_DEFAULT) * mHeaderSize);
         mImageView.setLayoutParams(layoutParams);
 
+        long blurTime = System.currentTimeMillis();
+
         /* 处理模糊操作 */
         disposeHeaderBlur(dy);
 
-        Log.w(TAG, "disposeHeaderView: disposeHeaderView cost time = " + (System.currentTimeMillis() - millis));
+        long end = System.currentTimeMillis();
+        Log.w(TAG, "disposeHeaderView: disposeHeaderView total cost time = " + (end - millis)+"; blur cost time = "+(end - blurTime));
         return true;
     }
 
@@ -258,8 +260,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         mTY += dy;
         /* mBlurRadius同时起到记录手指未抬起前移动的Y轴距离. 当它的值大于0时表示HeaderView完全可见
          * 这里用这个值作为是否要将图片置为原始图片的判断依据 */
-//        mBlurRadius += (dy * 0.01f);
-        mBlurRadius = 15 * ((mTargetScale - SCALE_DEFAULT) / (SCALE_TARGET - SCALE_DEFAULT));
+        mBlurRadius = 20 * ((mTargetScale - SCALE_DEFAULT) / (SCALE_TARGET - SCALE_DEFAULT));
 
         /* 为了避免反复的模糊渲染 */
         if (dy > 0 && mTY < 1) return;
@@ -276,10 +277,9 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         /* 表明HeaderView完全可见并且当前正在下拉,需要进行模糊处理 */
         else {
             /* 对原图片进行高斯模糊处理 */
-            bitmap = BlurUtils.makePictureBlur(getApplicationContext(), mForBlur, mImageView, 2, mBlurRadius);
+            bitmap = mStackBlurManager.process((int) (mBlurRadius));
         }
 
-//        Log.w(TAG, "disposeHeaderBlur: mBlurBgs.size() = " + mBlurBgs.size());
         mImageView.setImageBitmap(bitmap);
     }
 

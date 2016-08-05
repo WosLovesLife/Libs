@@ -22,6 +22,7 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
     private int mTypeCount;
 
     public BaseRecyclerViewAdapter() {
+        this(new ArrayList<T>());
     }
 
     public BaseRecyclerViewAdapter(List<T> data) {
