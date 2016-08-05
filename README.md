@@ -22,6 +22,8 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 
 2016.7.29: **Drag2DoubleUnfold** 控件, 实现二级展开的抽屉效果, 类似Android端知乎的分享或者百度地图的搜索结果页.
 
+![A Start B][drag2doubleunfold]
+
 使用方式:
 
 在布局xml文件中添加 `com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout` 控件,
@@ -57,7 +59,7 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 
 控制方法: <br/>
 
-改变滑动控件的形态 有三种常量值: FORM_PART 展开部分; FORM_COMP 完全展开; FORM_FOLD 完全收起<br/>
+改变滑动控件的形态 有三种常量值: `FORM_PART` 展开部分; `FORM_COMP` 完全展开; `FORM_FOLD` 完全收起<br/>
 `void controlForm(int form)`
 
 以FORM_PART的形态弹出控件<br/>
