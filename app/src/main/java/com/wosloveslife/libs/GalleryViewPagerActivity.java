@@ -48,14 +48,14 @@ public class GalleryViewPagerActivity extends AppCompatActivity {
 
     private List<Bitmap> getData() {
         List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg2));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg3));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg4));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg5));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg2));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg3));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg4));
+        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.bg5));
         return data;
     }
 }

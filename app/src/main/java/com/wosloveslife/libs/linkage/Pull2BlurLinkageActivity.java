@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -28,6 +29,11 @@ import com.wosloveslife.utils.wrapper_picture.CropPicture;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * 联动效果: 向上滑动时 Actionbar随之移动, 向下滑动时 随之显现.
@@ -98,7 +104,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, mHeaderSize);
         mImageView.setLayoutParams(params);
         mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        setHeaderImage(R.drawable.bg2);
+        setHeaderImage(R.drawable.header_bg1);
     }
 
     private void setHeaderImage(@DrawableRes int resId) {
@@ -254,7 +260,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
      *
      * @param dy y轴移动的距离
      */
-    private void disposeHeaderBlur(float dy) {
+    protected void disposeHeaderBlur(float dy) {
         if (dy == 0) return;
 
         mTY += dy;
@@ -269,18 +275,28 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
 
         Log.w(TAG, "disposeHeaderBlur: mBlurRadius = " + mBlurRadius);
 
-        Bitmap bitmap;
         /* dy作为判断方向的依据(上拉还是下拉),如果上拉并且模糊值<1就设置成原图 */
         if (mBlurRadius < 1 && dy < 0) {
-            bitmap = mOriginBitmap;
+            mImageView.setImageBitmap(mOriginBitmap);
         }
         /* 表明HeaderView完全可见并且当前正在下拉,需要进行模糊处理 */
         else {
             /* 对原图片进行高斯模糊处理 */
-            bitmap = mStackBlurManager.process((int) (mBlurRadius));
+            Observable.create(new Observable.OnSubscribe<Bitmap>() {
+                @Override
+                public void call(Subscriber<? super Bitmap> subscriber) {
+                    Log.w(TAG, "call: 模糊渲染开始 当前时间 = "+ SystemClock.currentThreadTimeMillis()+"; 当前线程 = "+Thread.currentThread());
+                    subscriber.onNext(mStackBlurManager.process((int) (mBlurRadius)));
+                    subscriber.onCompleted();
+                }
+            })
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(bitmap -> {
+                        mImageView.setImageBitmap(bitmap);
+                        Log.w(TAG, "call: 模糊渲染结束, 当前时间 = "+ SystemClock.currentThreadTimeMillis()+"; 当前线程 = "+Thread.currentThread());
+                    });
         }
-
-        mImageView.setImageBitmap(bitmap);
     }
 
     /** 回到默认值 */

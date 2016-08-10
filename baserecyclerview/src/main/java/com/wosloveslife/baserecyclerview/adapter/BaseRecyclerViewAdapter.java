@@ -111,6 +111,11 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
         return newPosition;
     }
 
+    public void setData(List<T> data){
+        mData =data;
+        notifyDataSetChanged();
+    }
+
     public T getData(int position) {
         if (position >= mData.size()) return null;
 
