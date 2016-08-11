@@ -17,53 +17,43 @@ import com.wosloveslife.intentkit.IntentKit;
 
 import java.io.File;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
- * Created by YesingBeijing on 2016/7/14.
+ * 展示从相册或相机获取照片,并跳转到剪裁器界面进行剪裁
+ * Created by WosLovesLife on 2016/7/14.
  */
 public class GetAndClipPhotoActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String TAG = "GetAndClipPhotoActivity";
-
     private static final int REQUEST_SMALL_PHOTO = 0;
     private static final int REQUEST_BIG_PHOTO = 1;
     private static final int REQUEST_CUSTOM_PHOTO = 2;
     private static final int REQUEST_PHOTO_CAMERA = 3;
     private static final int REQUEST_PHOTO_CAMERA2 = 4;
 
-    private Button mGetPhotoFromAlbum;
-    private ImageView mImageView;
-    private Button mGetBigPhotoFromAlbum;
+    @BindView(R.id.id_btn_get_photo_from_album)
+    Button mGetPhotoFromAlbum;
+    @BindView(R.id.id_btn_get_big_photo_from_album)
+    Button mGetBigPhotoFromAlbum;
+    @BindView(R.id.id_btn_get_custom_photo_from_album)
+    Button mGetCustomPhotoFromAlbum;
+    @BindView(R.id.id_btn_get_photo_from_camera)
+    Button mGetPhotoFromCamera;
+    @BindView(R.id.id_iv_show_photo)
+    ImageView mImageView;
+
     private Uri mBitPhotoUri;
-    private Button mGetCustomPhotoFromAlbum;
-    private Button mGetPhotoFromCamera;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_and_clip_photo);
-
-        init();
+        ButterKnife.bind(this);
     }
 
-    private void init() {
-        initView();
-    }
-
-    private void initView() {
-        mImageView = (ImageView) findViewById(R.id.id_iv_show_photo);
-
-        mGetPhotoFromAlbum = (Button) findViewById(R.id.id_btn_get_photo_from_album);
-        mGetPhotoFromAlbum.setOnClickListener(this);
-
-        mGetBigPhotoFromAlbum = (Button) findViewById(R.id.id_btn_get_big_photo_from_album);
-        mGetBigPhotoFromAlbum.setOnClickListener(this);
-
-        mGetCustomPhotoFromAlbum = (Button) findViewById(R.id.id_btn_get_custom_photo_from_album);
-        mGetCustomPhotoFromAlbum.setOnClickListener(this);
-
-        mGetPhotoFromCamera = (Button) findViewById(R.id.id_btn_get_photo_from_camera);
-        mGetPhotoFromCamera.setOnClickListener(this);
-    }
-
+    @OnClick({R.id.id_btn_get_photo_from_album,R.id.id_btn_get_big_photo_from_album,
+            R.id.id_btn_get_custom_photo_from_album,R.id.id_btn_get_photo_from_camera})
     @Override
     public void onClick(View v) {
         switch (v.getId()) {

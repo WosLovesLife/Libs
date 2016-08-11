@@ -23,6 +23,7 @@
         <activity android:name=".linkage.EnterAlwaysLinkageActivity"/>
         <activity android:name=".linkage.Pull2BlurLinkageActivity"/>
         <activity android:name=".Drag2DoubleUnfoldActivity"/>
+        <activity android:name=".SimpleFloatingLayoutActivity"/>
     </application>
 
 </manifest>

@@ -2,6 +2,8 @@
 
 **该工程会陆续push一些custom widget以及tool lib**
 
+**更新总览:**
+
 2016.7.13: **LoopViewPager** 通过ViewPager实现自动轮播功能的轮播图控件
 
 2016.7.13: **BaseRecyclerView** 对RecyclerView.Adapter进行了进一步封装, 可以添加多个Header条目
@@ -21,6 +23,13 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 ----
 
 2016.7.29: **Drag2DoubleUnfold** 控件, 实现二级展开的抽屉效果, 类似Android端知乎的分享或者百度地图的搜索结果页.
+
+2016.8.11: **SimpleFloatingLayout** 控件, 一个简单的流式布局, 子控件按照水平方向排列, 当子控件的宽度超过一行后, 自动换行. 可以用于做热门标签选择, 搜索历史等
+
+
+**展示/使用**
+
+**Drag2DoubleUnfold:**
 
 <img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/drag2doubleUnfold.gif"/>
 
@@ -90,3 +99,4 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 `void removeOnFormChangeListener(OnFormChangeListener onFormChangeListener)`
 
 ---
+

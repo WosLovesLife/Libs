@@ -9,8 +9,8 @@ import android.widget.Button;
 
 import com.wosloveslife.libs.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
 
 /**
@@ -19,18 +19,18 @@ import butterknife.OnClick;
  */
 public class LinkageActivity extends AppCompatActivity {
 
-    @InjectView(R.id.id_toolbar)
+    @BindView(R.id.id_toolbar)
     Toolbar mIdToolbar;
-    @InjectView(R.id.id_btn_effect_enter_always)
+    @BindView(R.id.id_btn_effect_enter_always)
     Button mIdBtnEffectEnterAlways;
-    @InjectView(R.id.id_btn_effect_pull_to_blur)
+    @BindView(R.id.id_btn_effect_pull_to_blur)
     Button mIdBtnEffectPullToBlur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_linkage);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
     }
 

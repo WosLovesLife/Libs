@@ -37,7 +37,7 @@
                 android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="LoopView示例"/>
+                android:text="Loop_View示例"/>
 
             <Button
                 android:id="@+id/id_btn_header_recycler_view"
@@ -45,7 +45,7 @@
                 android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="BaseRecyclerView示例"/>
+                android:text="Base_Recycler_View示例"/>
 
             <Button
                 android:id="@+id/id_btn_clip_photo"
@@ -53,7 +53,7 @@
                 android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="GetAndClipPhoto示例"/>
+                android:text="Get_And_Clip_Photo示例"/>
 
             <Button
                 android:id="@+id/id_btn_gallery"
@@ -61,7 +61,7 @@
                 android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="GalleryViewPager示例"/>
+                android:text="Gallery_View_Pager示例"/>
 
             <Button
                 android:id="@+id/id_btn_linkage"
@@ -77,7 +77,15 @@
                 android:textColor="@color/accent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Drag2DoubleUnfold联动效果示例"
+                android:text="Drag_2_Double_Unfold联动效果示例"
+                />
+            <Button
+                android:id="@+id/id_btn_floating_layout"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simple_Floating_Layout示例"
                 />
         </LinearLayout>
     </ScrollView>

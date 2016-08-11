@@ -9,9 +9,10 @@ import android.widget.Button;
 
 import com.wosloveslife.libs.linkage.LinkageActivity;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
 /**
  * 实例首页
@@ -19,29 +20,36 @@ import butterknife.OnClick;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    @InjectView(R.id.id_btn_loop_view)
+    @BindView(R.id.id_btn_loop_view)
     Button mIdBtnLoopView;
-    @InjectView(R.id.id_btn_header_recycler_view)
+    @BindView(R.id.id_btn_header_recycler_view)
     Button mIdBtnHeaderRecyclerView;
-    @InjectView(R.id.id_btn_clip_photo)
+    @BindView(R.id.id_btn_clip_photo)
     Button mIdBtnClipPhoto;
-    @InjectView(R.id.id_btn_gallery)
+    @BindView(R.id.id_btn_gallery)
     Button mIdBtnGallery;
-    @InjectView(R.id.id_btn_linkage)
+    @BindView(R.id.id_btn_linkage)
     Button mIdBtnLinkage;
-    @InjectView(R.id.id_btn_drag_unfold)
+    @BindView(R.id.id_btn_drag_unfold)
     Button mIdBtnDrag2DoubleUnfold;
+    private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+        mUnbinder = ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mUnbinder.unbind();
     }
 
     @OnClick({R.id.id_btn_loop_view, R.id.id_btn_header_recycler_view,
             R.id.id_btn_clip_photo, R.id.id_btn_gallery, R.id.id_btn_linkage,
-            R.id.id_btn_drag_unfold})
+            R.id.id_btn_drag_unfold, R.id.id_btn_floating_layout})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.id_btn_loop_view:
@@ -61,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.id_btn_drag_unfold:
                 enter(Drag2DoubleUnfoldActivity.class);
+                break;
+            case R.id.id_btn_floating_layout:
+                enter(SimpleFloatingLayoutActivity.class);
                 break;
         }
     }

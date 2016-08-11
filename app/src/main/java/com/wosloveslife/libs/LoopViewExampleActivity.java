@@ -14,18 +14,24 @@ import com.wosloveslife.loopviewpager.view.LoopViewPager;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * 轮播图LoopViewPager的实例类
  * Created by WosLovesLife on 2016/7/13.
  */
 public class LoopViewExampleActivity extends AppCompatActivity{
-    private LoopViewPager mLoopViewPager;
-    private LoopViewPager mLoopViewPager2;
+    @BindView(R.id.id_vp_loop_view_pager)
+    LoopViewPager mLoopViewPager;
+    @BindView(R.id.id_vp_loop_view_pager2)
+    LoopViewPager mLoopViewPager2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loop_view_example);
+        ButterKnife.bind(this);
 
         init();
     }
@@ -39,13 +45,17 @@ public class LoopViewExampleActivity extends AppCompatActivity{
         data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
         data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
 
-        mLoopViewPager = (LoopViewPager) findViewById(R.id.id_vp_loop_view_pager);
         mLoopViewPager.setAdapter(new MyLoopAdapter(data));
-        mLoopViewPager.startLoop();
 
-        mLoopViewPager2 = (LoopViewPager) findViewById(R.id.id_vp_loop_view_pager2);
         mLoopViewPager2.setAdapter(new MyLoopAdapter(data));
         mLoopViewPager2.setDuration(2500);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        mLoopViewPager.startLoop();
         mLoopViewPager2.startLoop();
     }
 
