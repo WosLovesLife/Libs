@@ -1,7 +1,5 @@
 package com.wosloveslife.libs.linkage;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -78,8 +76,10 @@ public class EnterAlwaysLinkageActivity extends AppCompatActivity {
          * 因为条目可能获取不到LayoutParams,所以手动设置一个 */
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(0, mActionBarHeight, 0, 0);
+        params.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+        params.width = FrameLayout.LayoutParams.MATCH_PARENT;
         imageView.setLayoutParams(params);
-        imageView.setImageResource(R.drawable.header_bg);
+        imageView.setImageResource(R.drawable.image4);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         adapter.addHeader(imageView);
 
@@ -110,21 +110,10 @@ public class EnterAlwaysLinkageActivity extends AppCompatActivity {
                 }
 
                 int height = mToolbar.getHeight();
-                Log.w(TAG, "onScrolled: mToolbar.getHeight() = "+height );
+                Log.w(TAG, "onScrolled: mToolbar.getHeight() = " + height);
                 params.setMargins(0, marginTop, 0, 0);
                 mToolbar.setLayoutParams(params);
             }
         });
-    }
-
-    /** 模拟数据 */
-    private List<Bitmap> getSimulatedData() {
-        List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon1));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
-        return data;
     }
 }

@@ -1,7 +1,6 @@
 package com.wosloveslife.libs;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 import com.wosloveslife.loopviewpager.adapter.LoopViewPagerAdapter;
 import com.wosloveslife.loopviewpager.view.LoopViewPager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,12 +36,7 @@ public class LoopViewExampleActivity extends AppCompatActivity{
 
     private void init() {
         /* 模拟数据 */
-        List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon1));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
+        List<Bitmap> data = DataUtils.getBitmaps(getApplicationContext());
 
         mLoopViewPager.setAdapter(new MyLoopAdapter(data));
 
@@ -68,6 +61,7 @@ public class LoopViewExampleActivity extends AppCompatActivity{
         @Override
         protected View onCreateView(ViewGroup container, int position) {
             final ImageView imageView = new ImageView(container.getContext());
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setImageBitmap(mData.get(position));
             return imageView;
         }

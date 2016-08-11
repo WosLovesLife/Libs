@@ -1,7 +1,6 @@
 package com.wosloveslife.libs;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.wosloveslife.baserecyclerview.adapter.BaseRecyclerViewAdapter;
@@ -58,23 +58,23 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         View view = getLayoutInflater().inflate(R.layout.view_item_recycler_view_header, null, false);
         mLoopViewPager = (LoopViewPager) view.findViewById(R.id.id_vp_loop_view_pager);
 
-        List<Bitmap> simulatedData = getSimulatedData();
+        List<Bitmap> simulatedData = DataUtils.getBitmaps(getApplicationContext());
         mLoopViewPager.setAdapter(new LoopViewPagerAdapter<Bitmap>(simulatedData) {
             @Override
             protected View onCreateView(ViewGroup container, int position) {
                 ImageView imageView = new ImageView(container.getContext());
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setImageBitmap(mData.get(position));
                 return imageView;
             }
         });
         mLoopViewPager.setDuration(1000);
-        mLoopViewPager.startLoop();
         adapter.addHeader(view);
 
-        ImageView imageView = new ImageView(this);
-        imageView.setImageResource(R.drawable.icon5);
-        adapter.addHeader(imageView);
-
+        Button button = new Button(this);
+        button.setText("这是一个新的HeaderView ,下面是Header轮播图");
+        button.setTextSize(16);
+        adapter.addHeader(button);
 
         mRecyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
@@ -85,23 +85,17 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
                 return super.animateAdd(holder);
             }
         });
-
-    }
-
-    /** 模拟数据 */
-    private List<Bitmap> getSimulatedData(){
-        List<Bitmap> data = new ArrayList<>();
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon1));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon2));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon3));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon4));
-        data.add(BitmapFactory.decodeResource(getResources(), R.drawable.icon5));
-        return data;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStart() {
+        super.onStart();
+        mLoopViewPager.startLoop();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         mLoopViewPager.stopLoop();
     }
 }
