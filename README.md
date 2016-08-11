@@ -4,7 +4,7 @@
 
 **更新总览:**
 
-2016.7.13: **LoopViewPager** 通过ViewPager实现自动轮播功能的轮播图控件
+2016.7.13: **LoopViewPager** 通过ViewPager实现自动轮播功能的轮播图控件, 被触摸是暂停自动轮播, 松开继续.
 
 2016.7.13: **BaseRecyclerView** 对RecyclerView.Adapter进行了进一步封装, 可以添加多个Header条目
 
@@ -30,7 +30,159 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 
 **展示/使用**
 
+
 ===
+
+**LoopViewPager:**
+
+<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Libs_LoopView.gif"/>
+
+使用方法:
+
+将loopviewpager的Module导入到项目中, 在Project Structure中添加依赖, 然后在布局xml文件中添加 `com.wosloveslife.loopviewpager.view.LoopViewPager` 控件.
+
+在代码中调用LoopViewPager的`void setAdapter(PagerAdapter adapter)`方法, 实现`PagerAdapter`类的抽象方法.
+
+示例:
+
+```
+private void init() {
+    /* 模拟数据 */
+    List<Bitmap> data = DataUtils.getBitmaps(getApplicationContext());
+
+    mLoopViewPager.setAdapter(new MyLoopAdapter(data));
+    mLoopViewPager.setDuration(3000);
+}
+
+class MyLoopAdapter extends LoopViewPagerAdapter<Bitmap> {
+    public MyLoopAdapter(List<Bitmap> data) {
+        super(data);
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup container, int position) {
+        final ImageView imageView = new ImageView(container.getContext());
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        imageView.setImageBitmap(mData.get(position));
+        return imageView;
+    }
+}
+```
+
+控制方法:
+
+开始轮播, 建议在`onStart()`生命周期中调用<br/>
+`void startLoop()`
+
+停止轮播, 建议在`onStop()`生命周期中调用<br/>
+`void stopLoop()`
+
+**注意!一定要在适当的生命周期方法中调用stopLoop()方法结束轮播,否则会造成内存泄漏.**
+
+设置轮播的间隔时间(毫秒)<br/>
+`void setDuration(int duration)`
+
+===
+
+**BaseRecyclerView:**
+
+<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Libs_baseRecyclerViewAdapter.gif"/>
+
+使用方法:
+
+将baserecyclerview的Module导入到项目中,在Project Structure中添加依赖.
+
+之后在使用RecyclerView的时候, Adapter继承自`com.wosloveslife.baserecyclerview.adapter.BaseRecyclerViewAdapter`.
+ViewHolder继承自`com.wosloveslife.baserecyclerview.viewHolder.BaseRecyclerViewHolder`
+
+示例:
+
+```
+private void initView() {
+    mRecyclerView = (RecyclerView) findViewById(R.id.id_rv_header_recycler_view);
+    mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+    BaseRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
+    mRecyclerView.setAdapter(adapter);
+
+    Button button = new Button(this);
+    button.setText("这是一个新的Header ,下面是Header轮播图");
+    button.setTextSize(16);
+    adapter.addHeader(button);
+}
+class MyRecyclerViewAdapter extends BaseRecyclerViewAdapter {
+
+    public MyRecyclerViewAdapter(List<String> data) {
+        super(data);
+    }
+
+    @Override
+    protected BaseRecyclerViewHolder onCreateItemViewHolder(ViewGroup parent) {
+        Button textView = new Button(parent.getContext());
+        ViewGroup.LayoutParams params = parent.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        textView.setLayoutParams(params);
+        return new HeaderRecyclerViewHolder(textView);
+    }
+}
+class HeaderRecyclerViewHolder extends BaseRecyclerViewHolder<String> {
+    protected TextView mTextView;
+
+    public HeaderRecyclerViewHolder(View itemView) {
+        super(itemView);
+        mTextView = (TextView) itemView;
+    }
+
+    public void onBind(String s) {
+        mTextView.setText(s);
+    }
+}
+```
+
+===
+
+**GalleryViewPager**
+
+<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Libs_galleryViewPager.gif"/>
+
+使用方式:
+
+将galleryviewpager的Module导入到项目中,在Project Structure中添加依赖, 然后在布局xml文件中添加 `com.wosloveslife.galleryviewpager.view.GalleryViewPager` 控件.
+调用Gallery的void setAdapter(PagerAdapter pagerAdapter)方法设置页面内容
+
+xml示例:
+```
+<com.wosloveslife.galleryviewpager.view.GalleryViewPager
+    android:id="@+id/id_gvp_gallery"
+    android:layout_width="match_parent"
+    android:layout_height="200dp">
+</com.wosloveslife.galleryviewpager.view.GalleryViewPager>
+```
+
+java示例:
+```
+private void initView() {
+    mGalleryViewPager = (GalleryViewPager) findViewById(R.id.id_gvp_gallery);
+    List<Bitmap> data = DataUtils.getBitmaps(getApplicationContext());
+    mGalleryViewPager.setAdapter(new SimplePagerAdapter<Bitmap>(data) {
+        @Override
+        public View onCreateView(ViewGroup container, int position) {
+            ImageView imageView = new ImageView(container.getContext());
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY  );
+            imageView.setImageBitmap(mData.get(position));
+            return imageView;
+        }
+    });
+}
+```
+
+控制方法:
+
+设置页面之间的间距<br/>
+`void setPageDistance(int distance)`
+
+=========
 
 **Drag2DoubleUnfold:**
 
@@ -38,7 +190,7 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 
 使用方式:
 
-在布局xml文件中添加 `com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout` 控件,
+将drag2doubleunfold的Module导入到项目中,在Project Structure中添加依赖, 然后在布局xml文件中添加 `com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout` 控件,
 并在子节点写自己布局, **注意: Drag2DoubleUnfoldLayout只能有一个直接的子节点**, 类似ScrollLayout
 
 示例:

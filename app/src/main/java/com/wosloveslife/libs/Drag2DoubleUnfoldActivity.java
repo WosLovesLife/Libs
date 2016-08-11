@@ -31,7 +31,6 @@ public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
                 Log.w(TAG, "onDismiss: " );
             }
         });
-        mDrag2DoubleUnfoldLayout.controlForm(Drag2DoubleUnfoldLayout.FORM_PART);
 
         Button changeForm = (Button) findViewById(R.id.id_btn_change);
         changeForm.setOnClickListener(v -> {
@@ -49,6 +48,8 @@ public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
             }
             mDrag2DoubleUnfoldLayout.controlForm(spreadState);
         });
+
+        mDrag2DoubleUnfoldLayout.show();
 
         CheckBox edgeTouch = (CheckBox) findViewById(R.id.id_cb_edge_enable);
         edgeTouch.setChecked(mDrag2DoubleUnfoldLayout.getEdgeTrackingEnabled());

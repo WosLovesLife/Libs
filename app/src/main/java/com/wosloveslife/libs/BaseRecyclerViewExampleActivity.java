@@ -72,7 +72,7 @@ public class BaseRecyclerViewExampleActivity extends AppCompatActivity {
         adapter.addHeader(view);
 
         Button button = new Button(this);
-        button.setText("这是一个新的HeaderView ,下面是Header轮播图");
+        button.setText("这是一个新的Header ,下面是Header轮播图");
         button.setTextSize(16);
         adapter.addHeader(button);
 

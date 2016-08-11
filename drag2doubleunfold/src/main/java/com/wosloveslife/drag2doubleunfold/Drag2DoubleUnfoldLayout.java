@@ -185,6 +185,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
                 }
 
                 /* 如果设置收起形态时移出该View,则在满足条件时收起时设置Visible为GONE */
+                Log.w(TAG, "onViewPositionChanged: top = " + top + "; mHeight = " + mHeight);
                 if (mAutoDismiss && top >= mHeight) {
                     clearAnimation();
                     mChildLayout.clearAnimation();
@@ -208,9 +209,6 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
                 Log.w(TAG, "onEdgeDragStarted: ");
             }
         });
-
-        /* 默认收起时控件为GONE */
-        setAutoDismissEnable(true);
     }
 
     /** 处理滑动相关事件，根据速度和位置展开或收起滑动控件 */
@@ -310,6 +308,9 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
             mBackground.setAlpha(0);
             mChildLayout.setVisibility(VISIBLE);
             controlForm(mCurrentForm);
+
+            /* 默认收起时控件为GONE */
+            setAutoDismissEnable(true);
         }
     }
 
@@ -330,6 +331,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
     }
 
     // 对外提供控制方法
+
     /**
      * @param form 改变滑动控件的形态
      * @see #FORM_PART 展开部分
@@ -394,7 +396,7 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
 
     /** 获取当前是否滑动控件完全收起时本控件将不可见(GONE) */
     public boolean getAutoDismissEnable() {
-        return mAutoDismiss;
+        return mFirstInit || mAutoDismiss;
     }
 
     // 对外提供事件监听

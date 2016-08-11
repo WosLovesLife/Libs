@@ -7,7 +7,6 @@
 
     <com.wosloveslife.galleryviewpager.view.GalleryViewPager
         android:id="@+id/id_gvp_gallery"
-        android:background="#e97373"
         android:layout_width="match_parent"
         android:layout_height="200dp">
 

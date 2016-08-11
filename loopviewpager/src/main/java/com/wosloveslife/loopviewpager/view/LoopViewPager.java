@@ -46,8 +46,18 @@ public class LoopViewPager extends ViewPager {
     private void init() {
     }
 
+    @Override
+    public void setAdapter(PagerAdapter adapter) {
+        super.setAdapter(adapter);
+
+        setCurrentItem(getCurrentItem() + getAdapter().getCount() / 2);
+    }
+
     /** 开始轮播 */
     public void startLoop() {
+        PagerAdapter adapter = getAdapter();
+        if (adapter == null || adapter.getCount() <= 1) return;
+
         if (!mLooping) {
             Log.w("LoopViewPager", "startLoop: mheander == null" + (mHandler == null));
             if (mHandler == null) {
@@ -69,14 +79,7 @@ public class LoopViewPager extends ViewPager {
         }
     }
 
-    @Override
-    public void setAdapter(PagerAdapter adapter) {
-        super.setAdapter(adapter);
-
-        setCurrentItem(getCurrentItem() + getAdapter().getCount() / 2);
-    }
-
-    /** 停止轮播, 注意!!! 一定要在Activity销毁前调用该方法, 不然会导致内存泄露  */
+    /** 停止轮播, 注意!!! 一定要在Activity销毁前调用该方法, 不然会导致内存泄露 */
     public void stopLoop() {
         pause();
         mHandler = null;

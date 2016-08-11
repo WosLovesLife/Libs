@@ -39,9 +39,10 @@ public class LoopViewExampleActivity extends AppCompatActivity{
         List<Bitmap> data = DataUtils.getBitmaps(getApplicationContext());
 
         mLoopViewPager.setAdapter(new MyLoopAdapter(data));
+        mLoopViewPager.setDuration(3000);
 
         mLoopViewPager2.setAdapter(new MyLoopAdapter(data));
-        mLoopViewPager2.setDuration(2500);
+        mLoopViewPager2.setDuration(1500);
     }
 
     @Override
