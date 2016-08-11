@@ -10,7 +10,7 @@
 
 2016.7.14: **GalleryViewPager** 用ViewPager实现横向照片墙效果(有缩放效果)
 
-----
+===
 
 Actionbar+RecyclerView(ListView)的联动效果系列
 
@@ -20,12 +20,13 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 
 松开或上拉恢复. 当第一个可见条目是HeaderView时,继续下拉逐渐改变Actionbar的背景透明度逐渐可见,上拉则逐渐不可见
 
-----
+===
 
 2016.7.29: **Drag2DoubleUnfold** 控件, 实现二级展开的抽屉效果, 类似Android端知乎的分享或者百度地图的搜索结果页.
 
 2016.8.11: **SimpleFloatingLayout** 控件, 一个简单的流式布局, 子控件按照水平方向排列, 当子控件的宽度超过一行后, 自动换行. 可以用于做热门标签选择, 搜索历史等
 
+----
 
 **展示/使用**
 
@@ -98,5 +99,5 @@ Actionbar+RecyclerView(ListView)的联动效果系列
 移出对形态改变事件的监听<br/>
 `void removeOnFormChangeListener(OnFormChangeListener onFormChangeListener)`
 
----
+----
 
