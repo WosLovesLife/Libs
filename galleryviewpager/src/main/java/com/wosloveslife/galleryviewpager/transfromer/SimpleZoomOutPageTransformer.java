@@ -9,21 +9,30 @@ import android.view.View;
  */
 public class SimpleZoomOutPageTransformer implements ViewPager.PageTransformer {
 
-    public static final float SCALE = 0.75f;
+    private static final float SCALE = 0.75f;
+
+    private float mScaleValue = SCALE;
 
     @Override
     public void transformPage(View page, float position) {
 
         /* A页的position变化是[ 0, -1] B页的position变化是[ 1 , 0 ] */
         if (position >= -1 && position <= 1) {
-            float scale = Math.max(SCALE, 1 - Math.abs(position));
+            float scale = Math.max(mScaleValue, 1 - Math.abs(position));
             page.setScaleX(scale);
             page.setScaleY(scale);
         }
         /* 对两边的view缩放到默认大小, 这样在图片一显现的时候就是缩放后的大小. */
-        else if (page.getScaleX() != SCALE) {
-            page.setScaleX(SCALE);
-            page.setScaleY(SCALE);
+        else if (page.getScaleX() != mScaleValue) {
+            page.setScaleX(mScaleValue);
+            page.setScaleY(mScaleValue);
         }
+    }
+
+    public void setScaleValue(float scaleValue){
+        if (scaleValue > 1f)scaleValue = 1f;
+        if (scaleValue < 0f) scaleValue = 0f;
+
+        mScaleValue = scaleValue;
     }
 }
