@@ -37,7 +37,6 @@ public class GalleryViewPagerActivity extends AppCompatActivity {
             @Override
             public View onCreateView(ViewGroup container, int position) {
                 ImageView imageView = new ImageView(container.getContext());
-                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP  );
                 imageView.setImageBitmap(mData.get(position));
                 return imageView;
             }

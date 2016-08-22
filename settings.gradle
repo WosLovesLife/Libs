@@ -1,1 +1,1 @@
-include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager', ':utils', ':drag2doubleunfold', ':simplefloatinglayout'
+include ':app', ':loopviewpager', ':baserecyclerview', ':intentkit', ':galleryviewpager', ':utils', ':drag2doubleunfold', ':simplefloatinglayout', ':multiviewpager'

@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button mIdBtnLinkage;
     @BindView(R.id.id_btn_drag_unfold)
     Button mIdBtnDrag2DoubleUnfold;
+    @BindView(R.id.id_btn_multi_view_pager)
+    Button mIdBtnMultiViewPager;
+
     private Unbinder mUnbinder;
 
     @Override
@@ -49,7 +52,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @OnClick({R.id.id_btn_loop_view, R.id.id_btn_header_recycler_view,
             R.id.id_btn_clip_photo, R.id.id_btn_gallery, R.id.id_btn_linkage,
-            R.id.id_btn_drag_unfold, R.id.id_btn_floating_layout})
+            R.id.id_btn_drag_unfold, R.id.id_btn_floating_layout,
+            R.id.id_btn_multi_view_pager})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.id_btn_loop_view:
@@ -72,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.id_btn_floating_layout:
                 enter(SimpleFloatingLayoutActivity.class);
+                break;
+            case R.id.id_btn_multi_view_pager:
+                enter(MultiViewPagerActivity.class);
                 break;
         }
     }

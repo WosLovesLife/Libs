@@ -123,6 +123,12 @@ public class Drag2DoubleUnfoldLayout extends FrameLayout {
         });
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.w(TAG, "onMeasure: ");
+    }
+
     /** 该控件的子节点必须有且只有一个ViewGroup类型的控件,拿到第一个控件, 如果控件超过一个 就抛出异常 */
     @Override
     protected void onFinishInflate() {

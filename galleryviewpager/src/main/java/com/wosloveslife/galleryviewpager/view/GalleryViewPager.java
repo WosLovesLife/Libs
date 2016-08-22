@@ -5,6 +5,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import com.wosloveslife.galleryviewpager.transfromer.SimpleZoomOutPageTransformer;
@@ -44,6 +45,7 @@ public class GalleryViewPager extends FrameLayout {
     private void init() {
         /* 不裁剪幕后控件 */
         setClipChildren(false);
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
         mGallery_vp = new ViewPager(getContext());
         addView(mGallery_vp);

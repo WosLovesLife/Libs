@@ -87,6 +87,14 @@
                 android:layout_height="wrap_content"
                 android:text="Simple_Floating_Layout示例"
                 />
+            <Button
+                android:id="@+id/id_btn_multi_view_pager"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/accent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Multi_View_Pager示例"
+                />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
