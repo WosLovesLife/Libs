@@ -1,7 +1,6 @@
 package com.wosloveslife.galleryviewpager.transfromer;
 
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -22,7 +21,6 @@ public class SimpleZoomOutPageTransformer implements ViewPager.PageTransformer {
             float scale = Math.max(mScaleValue, 1 - Math.abs(position));
             page.setScaleX(scale);
             page.setScaleY(scale);
-            Log.w(TAG, "transformPage: position = " + position);
         }
         /* 对两边的view缩放到默认大小, 这样在图片一显现的时候就是缩放后的大小. */
         else if (page.getScaleX() != mScaleValue) {

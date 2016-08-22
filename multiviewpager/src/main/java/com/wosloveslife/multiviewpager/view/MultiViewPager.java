@@ -411,48 +411,40 @@ public class MultiViewPager extends ViewGroup {
             mCurrentPosition = position;
             mCenterContainer = mContainers.get(newContainerPosition % mContainers.size());
 
-            if (transitionOffset > 0) {
-                if (newNextItemPosition < mItemCount) { // 处理右边的内容
-                    if (newNextCacheItemPosition < mItemCount) { // 处理右边的缓存
-                        ViewGroup group = mContainers.get(newNextCacheContainerPosition % mContainers.size());
+            if (transitionOffset > 0 && newNextCacheItemPosition < mItemCount) { // 处理右边的缓存
+                ViewGroup group = mContainers.get(newNextCacheContainerPosition % mContainers.size());
 
-                        /* 如果缓存容器的下标超过了实际容器集合大小, 则将缓存页的容器裁剪掉换到容器集合的尾部
-                         * 因为在 onLayout() 方法中是按照集合的顺序依次排列本控件的子View的, 所以剪裁到尾部就会排列在右侧
-                         * 同样的, 也需要将容器从本控件中移出并添加到本控件的尾部
-                         * 最后请求重新布局 */
-                        if (newNextCacheContainerPosition >= mContainers.size()) {
-                            mContainers.remove(group);
-                            mContainers.add(group);
-                            mOffset += mViewLimit;
-                            removeView(group);
-                            addView(group);
-                            requestLayout();
-                        }
-
-                        updateItem(group, newNextCacheItemPosition);
-                    }
+                /* 如果缓存容器的下标超过了实际容器集合大小, 则将缓存页的容器裁剪掉换到容器集合的尾部
+                 * 因为在 onLayout() 方法中是按照集合的顺序依次排列本控件的子View的, 所以剪裁到尾部就会排列在右侧
+                 * 同样的, 也需要将容器从本控件中移出并添加到本控件的尾部
+                 * 最后请求重新布局 */
+                if (newNextCacheContainerPosition >= mContainers.size()) {
+                    mContainers.remove(group);
+                    mContainers.add(group);
+                    mOffset += mViewLimit;
+                    removeView(group);
+                    addView(group);
+                    requestLayout();
                 }
-            } else {
-                if (newPreItemPosition >= 0) { // 处理左边的内容
-                    if (newPreCacheItemPosition >= 0) { // 处理左边的缓存
-                        /* 因为newPreCacheContainerPosition可能为负数, 所以为负时变换为最大值+偏移量
-                         * 这样就相当于找到最右边的容器的下标 */
-                        int pre = newPreCacheContainerPosition < 0 ? mContainers.size() + newPreCacheContainerPosition : newPreCacheContainerPosition;
-                        ViewGroup group = mContainers.get(pre);
 
-                        /* 参见上面的解释 */
-                        if (newPreCacheContainerPosition < 0) {
-                            mContainers.remove(group);
-                            mContainers.add(0, group);
-                            mOffset -= mViewLimit;
-                            removeView(group);
-                            addView(group, 0);
-                            requestLayout();
-                        }
+                updateItem(group, newNextCacheItemPosition);
+            } else if (transitionOffset < 0 && newPreCacheItemPosition >= 0) {// 处理左边的缓存
+                /* 因为newPreCacheContainerPosition可能为负数, 所以为负时变换为最大值+偏移量
+                 * 这样就相当于找到最右边的容器的下标 */
+                int pre = newPreCacheContainerPosition < 0 ? mContainers.size() + newPreCacheContainerPosition : newPreCacheContainerPosition;
+                ViewGroup group = mContainers.get(pre);
 
-                        updateItem(group, newPreCacheItemPosition);
-                    }
+                /* 参见上面的解释 */
+                if (newPreCacheContainerPosition < 0) {
+                    mContainers.remove(group);
+                    mContainers.add(0, group);
+                    mOffset -= mViewLimit;
+                    removeView(group);
+                    addView(group, 0);
+                    requestLayout();
                 }
+
+                updateItem(group, newPreCacheItemPosition);
             }
             break;
         }
@@ -464,6 +456,8 @@ public class MultiViewPager extends ViewGroup {
             ItemInfo nextInfo = mItems.get(j);
             boolean fromObject = mAdapter.isViewFromObject(group.getChildAt(0), nextInfo.object);
             if (fromObject) {
+                if (nextInfo.position == cacheItemPosition) return; // 不需要重新加载
+
                 mAdapter.destroyItem(group, nextInfo.position, nextInfo.object);
                 mAdapter.finishUpdate(group);
                 break;
