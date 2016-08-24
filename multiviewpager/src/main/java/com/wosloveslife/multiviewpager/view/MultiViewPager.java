@@ -1,6 +1,8 @@
 package com.wosloveslife.multiviewpager.view;
 
 import android.content.Context;
+import android.graphics.Camera;
+import android.graphics.Matrix;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -10,6 +12,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 
@@ -23,7 +26,7 @@ import java.util.List;
  * 一个可以显示左右两边的类似ViewPager控件
  * 本控件的缓存和复用思想就是将缓存容器(一个固定数量的集合)当作一个轮子而元素当作一条路, 不管路有多远(元素有多少),
  * 只要让轮子一直左右滚动即可(即滚动到不同的位置就装载那个位置所对应的页面)
- * <p>
+ * <p/>
  * Created by WosLovesLife on 2016/8/15.
  */
 public class MultiViewPager extends ViewGroup {
@@ -92,6 +95,18 @@ public class MultiViewPager extends ViewGroup {
 
     /** 为true时,限制用户滑动的距离, 使一次滑动最多翻一页 */
     private boolean mRestrict;
+    /** 记录当前的滑动事件是否向左, 作为缓存处理判断依据 */
+    private boolean mIsToLeft;
+
+
+    Camera transformationCamera = new Camera();
+    /** 侧边页默认缩放比例 */
+    private float unselectedScale = 0.8f;
+    private float scaleDownGravity = 0.5f;
+    private float unselectedAlpha = 1.0f;
+    private int actionDistance = Integer.MAX_VALUE;
+    private float unselectedSaturation = 0.0f;
+    private float maxRotation = 1.0f;
 
     static class ItemInfo {
         Object object;
@@ -132,7 +147,7 @@ public class MultiViewPager extends ViewGroup {
 
         initContainers();
 
-        mItems = new ArrayList<>();
+        mItems = new ArrayList<ItemInfo>();
 
         sTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
@@ -161,7 +176,7 @@ public class MultiViewPager extends ViewGroup {
             view.measure(childWidthSpec, childHeightSpec);
         }
 
-        mScrollRange = (mItemCount - 1) * childWidth + (mItemCount - 1) * mPageDistance;
+        mScrollRange = (mItemCount - 2) * childWidth + (mItemCount - 2) * mPageDistance;
     }
 
     /**
@@ -187,6 +202,7 @@ public class MultiViewPager extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        Log.w(TAG, "onLayout: ");
         int usedLeft = getPaddingLeft() + mSideWidth + mOffset;
         for (int i = 0; i < mRealCount; i++) {
             View v = mContainers.get(i);
@@ -208,8 +224,8 @@ public class MultiViewPager extends ViewGroup {
         int action = ev.getAction();
         if (action == MotionEvent.ACTION_MOVE && mState != STATE_IDLE) return true;
 
-        float x = getX();
-        float y = getY();
+        float x = ev.getX();
+        float y = ev.getY();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mLastTouchX = x;
@@ -219,7 +235,7 @@ public class MultiViewPager extends ViewGroup {
             case MotionEvent.ACTION_MOVE:
                 float movedX = Math.abs(mLastTouchX - x);
                 float movedY = Math.abs(mLastTouchY - y);
-                if (movedX > sTouchSlop && movedY > movedY) {
+                if (movedX > sTouchSlop) {
                     mState = STATE_SCROLL;
                 }
                 break;
@@ -228,7 +244,6 @@ public class MultiViewPager extends ViewGroup {
                 mState = STATE_IDLE;
                 break;
         }
-
         return mState != STATE_IDLE;
     }
 
@@ -247,14 +262,23 @@ public class MultiViewPager extends ViewGroup {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                Log.w(TAG, "onTouchEvent: ACTION_DOWN");
                 mLastTouchX = x;
                 mMovedX = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log.w(TAG, "onTouchEvent: ACTION_MOVE");
                 /** 默认向右滑动页面向左,因此取反 */
                 float movedX = -(x - mLastTouchX);
                 mLastTouchX = x;
                 mMovedX += movedX;
+
+                if (movedX > 0) {
+                    mIsToLeft = false;
+                } else if (movedX < 0) {
+                    mIsToLeft = true;
+                }
+
                 int scrollX = getScrollX();
                 /* 当滑动到边缘时, 忽略滑动操作, 节省开销 */
                 if (scrollX >= mScrollRange && movedX > 0 || scrollX <= 0 && movedX < 0) break;
@@ -267,6 +291,8 @@ public class MultiViewPager extends ViewGroup {
                 scrollBy((int) movedX, 0);
                 break;
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                Log.w(TAG, "onTouchEvent: ACTION_UP");
                 mVelocityTracker.computeCurrentVelocity(1000);
                 float xVelocity = mVelocityTracker.getXVelocity();
                 Log.w(TAG, "onTouchEvent: xVelocity = " + xVelocity);
@@ -381,6 +407,7 @@ public class MultiViewPager extends ViewGroup {
      * @param position 目标页数
      */
     private void computePage(int position) {
+        Log.w(TAG, "computePage: ");
         int transitionOffset = position - mCurrentPosition; // 跳转的页面数, 如果为负说明向左滑动, 为正向右滑动
         for (int i = 0; i < mRealCount; i++) {
             /* 找到当前处于中心页的容器对应的Item, 然后根据Item中保存的position值
@@ -404,6 +431,7 @@ public class MultiViewPager extends ViewGroup {
              * 注意: 下面的值只是估值, 即没有考虑集合的存储状态和下标是否越界等问题
              * 下标是否越界需要根据'预计'的值来判断并处理 */
             int newContainerPosition = mContainers.indexOf(mCenterContainer) + transitionOffset;
+            Log.w(TAG, "computePage: newContainerPosition = " + newContainerPosition + "; transitionOffset = " + transitionOffset);
             int newNextCacheContainerPosition = newContainerPosition + 2;
             int newPreCacheContainerPosition = newContainerPosition - 2;
 
@@ -492,6 +520,7 @@ public class MultiViewPager extends ViewGroup {
      * @param scrollX 当前滑动的坐标点
      */
     private void toTransformer(int scrollX) {
+        Log.w(TAG, "toTransformer: scrollX = " +scrollX);
         if (mPageTransformer != null) {
             final int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
@@ -503,10 +532,22 @@ public class MultiViewPager extends ViewGroup {
     }
 
     public void setAdapter(PagerAdapter adapter) {
+        Log.d(TAG, "setAdapter: new mItemCount = " + adapter.getCount());
+        if (mAdapter != null) {
+            mAdapter.startUpdate(this);
+            for (int i = 0; i < mItems.size(); i++) {
+                final ItemInfo ii = mItems.get(i);
+                mAdapter.destroyItem(this, ii.position, ii.object);
+            }
+            mAdapter.finishUpdate(this);
+            mItems.clear();
+            mCurrentPosition = 0;
+            scrollTo(0, 0);
+            removeAllViews();
+        }
+
         mAdapter = adapter;
         mItemCount = mAdapter.getCount();
-        mItems.clear();
-        removeAllViews();
 
         mRealCount = Math.min(mItemCount, mContainers.size());
         for (int i = 0; i < mRealCount; i++) {
@@ -524,6 +565,9 @@ public class MultiViewPager extends ViewGroup {
                 mCenterContainer = group;
             }
         }
+        requestLayout();
+
+//        toTransformer(getScrollX());
     }
 
     /**
@@ -533,7 +577,7 @@ public class MultiViewPager extends ViewGroup {
     private void initContainers() {
         if (mContainers != null) return;
 
-        mContainers = new ArrayList<>();
+        mContainers = new ArrayList<ViewGroup>();
         FrameLayout layout = new FrameLayout(getContext());
         layout.setId(R.id.wosloveslife_container1);
         FrameLayout layout2 = new FrameLayout(getContext());
@@ -549,6 +593,73 @@ public class MultiViewPager extends ViewGroup {
         mContainers.add(layout3);
         mContainers.add(layout4);
         mContainers.add(layout5);
+    }
+
+    @Override
+    protected boolean getChildStaticTransformation(View child, Transformation t) {
+        // We can cast here because FancyCoverFlowAdapter only creates wrappers.
+//        FancyCoverFlowItemWrapper item = (FancyCoverFlowItemWrapper) child;
+        ViewGroup item = (ViewGroup) child;
+
+        // Since Jelly Bean childs won't get invalidated automatically, needs to be added for the smooth coverflow animation
+        if (android.os.Build.VERSION.SDK_INT >= 16) {
+            item.invalidate();
+        }
+
+        final int coverFlowWidth = this.getWidth();
+        final int coverFlowCenter = coverFlowWidth / 2;
+        final int childWidth = item.getWidth();
+        final int childHeight = item.getHeight();
+        final int childCenter = item.getLeft() + childWidth / 2;
+
+        // Use coverflow width when its defined as automatic.
+        final int actionDistance = (this.actionDistance == Integer.MAX_VALUE) ? (int) ((coverFlowWidth + childWidth) / 2.0f) : this.actionDistance;
+
+        // Calculate the abstract amount for all effects.
+        final float effectsAmount = Math.min(1.0f, Math.max(-1.0f, (1.0f / actionDistance) * (childCenter - coverFlowCenter)));
+
+        // Clear previous transformations and set transformation type (matrix + alpha).
+        t.clear();
+        t.setTransformationType(Transformation.TYPE_BOTH);
+
+        // Alpha
+        if (this.unselectedAlpha != 1) {
+            final float alphaAmount = (this.unselectedAlpha - 1) * Math.abs(effectsAmount) + 1;
+            t.setAlpha(alphaAmount);
+        }
+
+        // Saturation
+//        if (this.unselectedSaturation != 1) {
+//            // Pass over saturation to the wrapper.
+//            final float saturationAmount = (this.unselectedSaturation - 1) * Math.abs(effectsAmount) + 1;
+//            item.setSaturation(saturationAmount);
+//        }
+
+        final Matrix imageMatrix = t.getMatrix();
+
+        // Apply rotation.
+        if (this.maxRotation != 0) {
+            final int rotationAngle = (int) (-effectsAmount * this.maxRotation);
+            this.transformationCamera.save();
+            //heiyue 2015-07-29 modify 使旋转效果翻转
+//            this.transformationCamera.rotateY(rotationAngle);
+            this.transformationCamera.rotateY(-rotationAngle);
+            this.transformationCamera.getMatrix(imageMatrix);
+            this.transformationCamera.restore();
+        }
+
+        // Zoom.
+        if (this.unselectedScale != 1) {
+            final float zoomAmount = (this.unselectedScale - 1) * Math.abs(effectsAmount) + 1;
+            // Calculate the scale anchor (y anchor can be altered)
+            final float translateX = childWidth / 2.0f;
+            final float translateY = childHeight * this.scaleDownGravity;
+            imageMatrix.preTranslate(-translateX, -translateY);
+            imageMatrix.postScale(zoomAmount, zoomAmount);
+            imageMatrix.postTranslate(translateX, translateY);
+        }
+
+        return true;
     }
 
     ////////////控制方法
