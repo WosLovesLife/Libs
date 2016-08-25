@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Libs.iml" filepath="$PROJECT_DIR$/Libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/baserecyclerview/baserecyclerview.iml" filepath="$PROJECT_DIR$/baserecyclerview/baserecyclerview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/drag2doubleunfold/drag2doubleunfold.iml" filepath="$PROJECT_DIR$/drag2doubleunfold/drag2doubleunfold.iml" />
+      <module fileurl="file://$PROJECT_DIR$/galleryviewpager/galleryviewpager.iml" filepath="$PROJECT_DIR$/galleryviewpager/galleryviewpager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intentkit/intentkit.iml" filepath="$PROJECT_DIR$/intentkit/intentkit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/loopviewpager/loopviewpager.iml" filepath="$PROJECT_DIR$/loopviewpager/loopviewpager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/multiviewpager/multiviewpager.iml" filepath="$PROJECT_DIR$/multiviewpager/multiviewpager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simplefloatinglayout/simplefloatinglayout.iml" filepath="$PROJECT_DIR$/simplefloatinglayout/simplefloatinglayout.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utils/utils.iml" filepath="$PROJECT_DIR$/utils/utils.iml" />
+    </modules>
+  </component>
+</project>

@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import java.util.List;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -163,16 +165,19 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
             }
         });
 
-        mRecyclerView.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_MOVE:
-                    return disposeHeaderView(event);
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    toDefault();
+        mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        return disposeHeaderView(event);
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        toDefault();
 
+                }
+                return false;
             }
-            return false;
         });
     }
 
@@ -251,7 +256,7 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         disposeHeaderBlur(dy);
 
         long end = System.currentTimeMillis();
-        Log.w(TAG, "disposeHeaderView: disposeHeaderView total cost time = " + (end - millis)+"; blur cost time = "+(end - blurTime));
+        Log.w(TAG, "disposeHeaderView: disposeHeaderView total cost time = " + (end - millis) + "; blur cost time = " + (end - blurTime));
         return true;
     }
 
@@ -285,16 +290,19 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
             Observable.create(new Observable.OnSubscribe<Bitmap>() {
                 @Override
                 public void call(Subscriber<? super Bitmap> subscriber) {
-                    Log.w(TAG, "call: 模糊渲染开始 当前时间 = "+ SystemClock.currentThreadTimeMillis()+"; 当前线程 = "+Thread.currentThread());
+                    Log.w(TAG, "call: 模糊渲染开始 当前时间 = " + SystemClock.currentThreadTimeMillis() + "; 当前线程 = " + Thread.currentThread());
                     subscriber.onNext(mStackBlurManager.process((int) (mBlurRadius)));
                     subscriber.onCompleted();
                 }
             })
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(bitmap -> {
-                        mImageView.setImageBitmap(bitmap);
-                        Log.w(TAG, "call: 模糊渲染结束, 当前时间 = "+ SystemClock.currentThreadTimeMillis()+"; 当前线程 = "+Thread.currentThread());
+                    .subscribe(new Action1<Bitmap>() {
+                        @Override
+                        public void call(Bitmap bitmap) {
+                            mImageView.setImageBitmap(bitmap);
+                            Log.w(TAG, "call: 模糊渲染结束, 当前时间 = " + SystemClock.currentThreadTimeMillis() + "; 当前线程 = " + Thread.currentThread());
+                        }
                     });
         }
     }
@@ -329,7 +337,12 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
                 }
             });
 
-            new Handler().postDelayed(this::toHeightDefault, 10);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toHeightDefault();
+                }
+            }, 10);
 
             mTargetScale = SCALE_DEFAULT;
         } else {
@@ -349,7 +362,12 @@ public class Pull2BlurLinkageActivity extends AppCompatActivity {
         }
 
         mImageView.setLayoutParams(layoutParams);
-        new Handler().postDelayed(this::toHeightDefault, 15);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toHeightDefault();
+            }
+        }, 15);
     }
 
     private void toBlurDefault() {
