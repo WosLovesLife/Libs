@@ -9,18 +9,19 @@ import android.view.View;
  * Created by WosLovesLife on 2016/7/13.
  */
 public abstract class BaseRecyclerViewHolder<T> extends RecyclerView.ViewHolder {
+    protected View mView;
 
     public BaseRecyclerViewHolder(View itemView) {
         super(itemView);
 
+        mView = itemView;
         onCreateView(itemView);
-
     }
 
     public void onCreateView(View view){
     }
 
-    public abstract void onBind(T data);
+    public abstract void onBind(T data, int position);
 
     public Context getContext(){
         return itemView.getContext();
