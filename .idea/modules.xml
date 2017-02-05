@@ -11,6 +11,7 @@
       <module fileurl="file://$PROJECT_DIR$/loopviewpager/loopviewpager.iml" filepath="$PROJECT_DIR$/loopviewpager/loopviewpager.iml" />
       <module fileurl="file://$PROJECT_DIR$/multiviewpager/multiviewpager.iml" filepath="$PROJECT_DIR$/multiviewpager/multiviewpager.iml" />
       <module fileurl="file://$PROJECT_DIR$/simplefloatinglayout/simplefloatinglayout.iml" filepath="$PROJECT_DIR$/simplefloatinglayout/simplefloatinglayout.iml" />
+      <module fileurl="file://$PROJECT_DIR$/simplelongpicuturelayout/simplelongpicuturelayout.iml" filepath="$PROJECT_DIR$/simplelongpicuturelayout/simplelongpicuturelayout.iml" />
       <module fileurl="file://$PROJECT_DIR$/utils/utils.iml" filepath="$PROJECT_DIR$/utils/utils.iml" />
     </modules>
   </component>

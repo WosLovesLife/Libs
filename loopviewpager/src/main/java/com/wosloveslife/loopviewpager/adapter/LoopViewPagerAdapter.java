@@ -4,6 +4,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,16 +21,17 @@ public abstract class LoopViewPagerAdapter<T> extends PagerAdapter {
     /** 轮播总数 = BASE_COUNT * mData.size() */
     protected int mCount;
 
+    public LoopViewPagerAdapter() {
+        this(new ArrayList<T>());
+    }
+
     public LoopViewPagerAdapter(List<T> data) {
         mData = data;
+        setCount();
     }
 
     @Override
     public int getCount() {
-        if (mData == null)
-            return 0;
-
-        mCount = BASE_COUNT * mData.size();
         return mCount;
     }
 
@@ -57,7 +59,11 @@ public abstract class LoopViewPagerAdapter<T> extends PagerAdapter {
     /** 使用该方法变更轮播图内容 */
     public void setData(List<T> data) {
         mData = data;
-
+        setCount();
         notifyDataSetChanged();
+    }
+
+    private void setCount() {
+        mCount = BASE_COUNT * mData.size();
     }
 }

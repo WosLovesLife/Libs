@@ -5,7 +5,6 @@ import android.database.DataSetObserver;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -151,7 +150,7 @@ public class MultiViewPager extends ViewGroup {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.w(TAG, "onMeasure: ");
+//        Log.w(TAG, "onMeasure: ");
         mViewWidth = measureSize(widthMeasureSpec, 400);
         int height = measureSize(heightMeasureSpec, 200);
         setMeasuredDimension(mViewWidth, height);
@@ -195,7 +194,7 @@ public class MultiViewPager extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        Log.w(TAG, "onLayout: ");
+//        Log.w(TAG, "onLayout: ");
         int usedLeft = getPaddingLeft() + mSideWidth + mOffset;
         for (int i = 0; i < mRealCount; i++) {
             View v = mContainers.get(i);
@@ -255,7 +254,7 @@ public class MultiViewPager extends ViewGroup {
                 break;
         }
         boolean b = mState != STATE_IDLE;
-        Log.w(TAG, "onInterceptTouchEvent: 事件 = " + ev.getAction() + "; 是否拦截 = " + b);
+//        Log.w(TAG, "onInterceptTouchEvent: 事件 = " + ev.getAction() + "; 是否拦截 = " + b);
         return b;
     }
 
@@ -269,15 +268,15 @@ public class MultiViewPager extends ViewGroup {
             }
         }
         boolean b = super.dispatchTouchEvent(ev);
-        Log.w(TAG, "dispatchTouchEvent: " + b + "; action = " + ev.getAction() + "; 是否分发 = " + b);
+//        Log.w(TAG, "dispatchTouchEvent: " + b + "; action = " + ev.getAction() + "; 是否分发 = " + b);
         return b;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.w(TAG, "onTouchEvent: 事件 = " + event.getAction());
+//        Log.w(TAG, "onTouchEvent: 事件 = " + event.getAction());
         if (!mScroller.isFinished()) {
-            Log.w(TAG, "onTouchEvent: mScroller.isNotFinished");
+//            Log.w(TAG, "onTouchEvent: mScroller.isNotFinished");
             mScroller.abortAnimation();
         }
         float x = event.getX();
@@ -289,12 +288,12 @@ public class MultiViewPager extends ViewGroup {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.w(TAG, "onTouchEvent: ACTION_DOWN");
+//                Log.w(TAG, "onTouchEvent: ACTION_DOWN");
                 mLastTouchX = x;
                 mMovedX = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.w(TAG, "onTouchEvent: ACTION_MOVE");
+//                Log.w(TAG, "onTouchEvent: ACTION_MOVE");
                 /** 默认向右滑动页面向左,因此取反 */
                 float movedX = -(x - mLastTouchX);
                 mLastTouchX = x;
@@ -318,12 +317,12 @@ public class MultiViewPager extends ViewGroup {
                 scrollBy((int) movedX, 0);
                 break;
             case MotionEvent.ACTION_UP:
-                Log.w(TAG, "onTouchEvent: ACTION_UP");
+//                Log.w(TAG, "onTouchEvent: ACTION_UP");
             case MotionEvent.ACTION_CANCEL:
-                Log.w(TAG, "onTouchEvent: ACTION_CANCEL");
+//                Log.w(TAG, "onTouchEvent: ACTION_CANCEL");
                 mVelocityTracker.computeCurrentVelocity(1000);
                 float xVelocity = mVelocityTracker.getXVelocity();
-                Log.w(TAG, "onTouchEvent: xVelocity = " + xVelocity);
+//                Log.w(TAG, "onTouchEvent: xVelocity = " + xVelocity);
 
                 /* 释放速度监听器 */
                 if (mVelocityTracker != null) {
@@ -372,7 +371,7 @@ public class MultiViewPager extends ViewGroup {
     /** 滚动到上一页 */
     private void toPrevious(int scrollX) {
         int position = scrollX / mViewLimit;
-        Log.w(TAG, "toPrevious: position = " + position);
+//        Log.w(TAG, "toPrevious: position = " + position);
         onPageChanged(position);
 
         int offset = -(scrollX % mViewLimit);
@@ -382,7 +381,7 @@ public class MultiViewPager extends ViewGroup {
     /** 滚动到下一页 */
     private void toNext(int scrollX) {
         int position = scrollX / mViewLimit + 1;
-        Log.w(TAG, "toNext: position = " + position);
+//        Log.w(TAG, "toNext: position = " + position);
         onPageChanged(position);
 
         int offset = mViewLimit - (scrollX % mViewLimit);
@@ -402,7 +401,7 @@ public class MultiViewPager extends ViewGroup {
         if (scrollX >= mScrollRange && target > 0 || scrollX <= 0 && target < 0) return;
 
         int time = (int) (Math.abs(target + 0f) / mViewLimit * 300) + 100;
-        Log.w(TAG, "scrollToSomePlace: getScrollX() = " + scrollX + "; target = " + target + "; time = " + time);
+//        Log.w(TAG, "scrollToSomePlace: getScrollX() = " + scrollX + "; target = " + target + "; time = " + time);
 
         mScroller.startScroll(scrollX, 0, target, 0, time);
         invalidate();
@@ -423,6 +422,8 @@ public class MultiViewPager extends ViewGroup {
         /** 没有切换页面,不需进行任何操作 */
         if (targetPagePosition == mCurrentPosition) return;
 
+        //TODO: 调整targetPagePosition, 根据这个值写转换动画, 缩放效果
+
         /* 只有真实页面数量大于3的时候才开启缓存策略, 因为最低显示三页, 因此低于三页的缓存无意义 */
         if (mRealCount > 3) {
             computePage(targetPagePosition);
@@ -433,7 +434,7 @@ public class MultiViewPager extends ViewGroup {
      * @param position 目标页数
      */
     private void computePage(int position) {
-        Log.w(TAG, "computePage: ");
+//        Log.w(TAG, "computePage: ");
         int transitionOffset = position - mCurrentPosition; // 跳转的页面数, 如果为负说明向左滑动, 为正向右滑动
         for (int i = 0; i < mRealCount; i++) {
             /* 找到当前处于中心页的容器对应的Item, 然后根据Item中保存的position值
@@ -457,7 +458,7 @@ public class MultiViewPager extends ViewGroup {
              * 注意: 下面的值只是估值, 即没有考虑集合的存储状态和下标是否越界等问题
              * 下标是否越界需要根据'预计'的值来判断并处理 */
             int newContainerPosition = mContainers.indexOf(mCenterContainer) + transitionOffset;
-            Log.w(TAG, "computePage: newContainerPosition = " + newContainerPosition + "; transitionOffset = " + transitionOffset);
+//            Log.w(TAG, "computePage: newContainerPosition = " + newContainerPosition + "; transitionOffset = " + transitionOffset);
             int newNextCacheContainerPosition = newContainerPosition + 2;
             int newPreCacheContainerPosition = newContainerPosition - 2;
 
@@ -506,7 +507,6 @@ public class MultiViewPager extends ViewGroup {
 
     private void updateItem(ViewGroup group, int cacheItemPosition) {
         /* 找到这个缓存容器原本装载的Item, 将其卸载掉 */
-        mAdapter.startUpdate(group);
         for (int j = 0; j < mRealCount; j++) {
             ItemInfo nextInfo = mItems.get(j);
             boolean fromObject = mAdapter.isViewFromObject(group.getChildAt(0), nextInfo.object);
@@ -514,10 +514,10 @@ public class MultiViewPager extends ViewGroup {
                 if (nextInfo.position == cacheItemPosition) return; // 不需要重新加载
 
                 mAdapter.destroyItem(group, nextInfo.position, nextInfo.object);
+                mAdapter.finishUpdate(group);
                 break;
             }
         }
-        mAdapter.finishUpdate(group);
 
         /* 加载新的Item进缓存容器 */
         Object item = mAdapter.instantiateItem(group, cacheItemPosition);   // 参1 容器, 参2 要去的View位于集合的位置
@@ -558,7 +558,7 @@ public class MultiViewPager extends ViewGroup {
     }
 
     public void setAdapter(PagerAdapter adapter) {
-        Log.d(TAG, "setAdapter: new mItemCount = " + adapter.getCount());
+//        Log.d(TAG, "setAdapter: new mItemCount = " + adapter.getCount());
         if (mAdapter != null) {
             mAdapter.unregisterDataSetObserver(mObserver);
             mAdapter.startUpdate(this);
@@ -570,9 +570,6 @@ public class MultiViewPager extends ViewGroup {
             mItems.clear();
             mCurrentPosition = -1;
             removeAllViews();
-
-            mOffset = 0;
-            scrollTo(0, 0);
         }
 
         mAdapter = adapter;
@@ -597,23 +594,26 @@ public class MultiViewPager extends ViewGroup {
             }
         }
         mAdapter.finishUpdate(this);   // 结束Fragment的添加事件
+
+        mOffset = 0;
+        scrollTo(0,0);
         computePage(mCurrentPosition);
         requestLayout();
 
         toTransformer(getScrollX());
     }
 
-    DataSetObserver mObserver = new DataSetObserver() {
+    DataSetObserver mObserver = new DataSetObserver(){
         @Override
         public void onChanged() {
             super.onChanged();
-            Log.w(TAG, "DataSetObserver onChanged: ");
+//            Log.w(TAG, "DataSetObserver onChanged: ");
         }
 
         @Override
         public void onInvalidated() {
             super.onInvalidated();
-            Log.w(TAG, "DataSetObserver onInvalidated: ");
+//            Log.w(TAG, "DataSetObserver onInvalidated: ");
         }
     };
 

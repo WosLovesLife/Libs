@@ -4,15 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <Button
         android:id="@+id/btn_add_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="添加一页"/>
+
+    <EditText
+        android:id="@+id/et_to_position"
+        android:layout_toRightOf="@id/btn_add_data"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_height="wrap_content"
+        android:hint="滑动到某一页"/>
+
     <com.wosloveslife.multiviewpager.view.MultiViewPager
         android:id="@+id/banner_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn_add_data">
 
     </com.wosloveslife.multiviewpager.view.MultiViewPager>
 </RelativeLayout>

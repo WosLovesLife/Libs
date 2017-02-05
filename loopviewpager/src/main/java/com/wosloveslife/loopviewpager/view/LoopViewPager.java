@@ -1,6 +1,7 @@
 package com.wosloveslife.loopviewpager.view;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -15,17 +16,25 @@ import android.view.MotionEvent;
  * Created by YesingBeijing on 2016/7/12.
  */
 public class LoopViewPager extends ViewPager {
+    private static final String TAG = "LoopViewPager";
 
-    private boolean mLooping;
+    private static final int LOOP_STATE_IDLE = 0;
+    private static final int LOOP_STATE_PREPARE = 1;
+    private static final int LOOP_STATE_LOOPING = 2;
+
+    private int mLooping = LOOP_STATE_IDLE;
     private int mDuration = 5000;
 
     Handler mHandler;
+    PagerAdapter mAdapter;
+    private PagerObserver mPagerObserver;
 
     /** 对于轮播的处理, 跳转到下一页 */
     private void nextPager() {
+        Log.w(TAG, "nextPager : " + (getCurrentItem() + 1));
         setCurrentItem(getCurrentItem() + 1, true);
 
-        if (mLooping) {
+        if (mLooping == LOOP_STATE_LOOPING) {
             loop();
         }
     }
@@ -37,28 +46,36 @@ public class LoopViewPager extends ViewPager {
 
     public LoopViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
-
-        init();
     }
     ////////// 构造-end //////////
 
-    /** 初始化默认设置 */
-    private void init() {
-    }
-
     @Override
     public void setAdapter(PagerAdapter adapter) {
+        if (mAdapter != null) {
+            mAdapter.unregisterDataSetObserver(mPagerObserver);
+        }
+
+        mAdapter = adapter;
+
         super.setAdapter(adapter);
 
-        setCurrentItem(getCurrentItem() + getAdapter().getCount() / 2);
+        updateItem();
+
+        if (mAdapter != null) {
+            if (mPagerObserver == null) {
+                mPagerObserver = new PagerObserver();
+            }
+            mAdapter.registerDataSetObserver(mPagerObserver);
+        }
     }
 
-    /** 开始轮播 */
+    /** 开始轮播/或准备轮播 */
     public void startLoop() {
-        PagerAdapter adapter = getAdapter();
-        if (adapter == null || adapter.getCount() <= 1) return;
+        mLooping = LOOP_STATE_PREPARE;
 
-        if (!mLooping) {
+        if (mAdapter == null || mAdapter.getCount() <= 1) return;
+
+        if (mLooping == LOOP_STATE_PREPARE) {
             Log.w("LoopViewPager", "startLoop: mheander == null" + (mHandler == null));
             if (mHandler == null) {
                 mHandler = new Handler(Looper.getMainLooper()) {
@@ -74,8 +91,11 @@ public class LoopViewPager extends ViewPager {
                 };
             }
 
+            updateItem();
+
             loop();
-            mLooping = true;
+
+            mLooping = LOOP_STATE_LOOPING;
         }
     }
 
@@ -84,16 +104,18 @@ public class LoopViewPager extends ViewPager {
         pause();
         mHandler = null;
 
-        mLooping = false;
+        mLooping = LOOP_STATE_IDLE;
     }
 
     /** 调用该方法轮播 */
     private void loop() {
-        mHandler.sendEmptyMessageDelayed(0, mDuration);
+        if (mHandler != null)
+            mHandler.sendEmptyMessageDelayed(0, mDuration);
     }
 
     private void pause() {
-        mHandler.removeCallbacksAndMessages(null);
+        if (mHandler != null)
+            mHandler.removeCallbacksAndMessages(null);
     }
 
     /** 设置轮播图的间隔时间 */
@@ -101,44 +123,57 @@ public class LoopViewPager extends ViewPager {
         mDuration = duration;
     }
 
-
-    private float downX;
-    private float downY;
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (mLooping == LOOP_STATE_LOOPING) {
+            pause();
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
 
     /** 当手指触摸到该组件时,停止轮播,当手指离开继续轮播 */
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                downX = ev.getX();
-                downY = ev.getY();
-
-                if (mLooping) {
-                    pause();
-                }
-                return true;
-
-            case MotionEvent.ACTION_MOVE:
-                float x = ev.getX();
-                float y = ev.getY();
-                float moveX = Math.abs(x - downX);
-                float moveY = Math.abs(y - downY);
-                downX = x;
-                downY = y;
-
-                if (moveX > moveY) {
-                    return super.onTouchEvent(ev);
-                }
-                break;
-
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (mLooping) {
+                if (mLooping == LOOP_STATE_LOOPING) {
                     loop();
                 }
                 break;
         }
-
         return super.onTouchEvent(ev);
+    }
+
+
+    private class PagerObserver extends DataSetObserver {
+        @Override
+        public void onChanged() {
+            Log.w(TAG, "onChanged: ");
+            checkLoop();
+        }
+
+        @Override
+        public void onInvalidated() {
+            Log.w(TAG, "onInvalidated: ");
+            checkLoop();
+        }
+    }
+
+    private void checkLoop() {
+        if (mLooping != LOOP_STATE_IDLE) {
+            if (mAdapter != null && mAdapter.getCount() > 1 && mLooping == LOOP_STATE_PREPARE) {
+                updateItem();
+                startLoop();
+            }
+
+            if (mAdapter == null || mAdapter.getCount() <= 1) {
+                stopLoop();
+            }
+        }
+    }
+
+    private void updateItem() {
+        setCurrentItem(mAdapter.getCount() / 2 + getCurrentItem());
     }
 }

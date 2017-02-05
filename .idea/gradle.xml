@@ -16,23 +16,11 @@
             <option value="$PROJECT_DIR$/loopviewpager" />
             <option value="$PROJECT_DIR$/multiviewpager" />
             <option value="$PROJECT_DIR$/simplefloatinglayout" />
+            <option value="$PROJECT_DIR$/simplelongpicuturelayout" />
             <option value="$PROJECT_DIR$/utils" />
           </set>
         </option>
-        <option name="myModules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/baserecyclerview" />
-            <option value="$PROJECT_DIR$/drag2doubleunfold" />
-            <option value="$PROJECT_DIR$/galleryviewpager" />
-            <option value="$PROJECT_DIR$/intentkit" />
-            <option value="$PROJECT_DIR$/loopviewpager" />
-            <option value="$PROJECT_DIR$/multiviewpager" />
-            <option value="$PROJECT_DIR$/simplefloatinglayout" />
-            <option value="$PROJECT_DIR$/utils" />
-          </set>
-        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
