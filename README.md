@@ -142,14 +142,14 @@ class HeaderRecyclerViewHolder extends BaseRecyclerViewHolder<String> {
 
 ===
 
-**GalleryViewPager**
+**MultiViewPager**
 
-<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Libs_galleryViewPager.gif"/>
+<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Intro_MultiViewPager.gif"/>
 
 使用方式:
 
-将galleryviewpager的Module导入到项目中,在Project Structure中添加依赖, 然后在布局xml文件中添加 `com.wosloveslife.galleryviewpager.view.GalleryViewPager` 控件.
-调用Gallery的void setAdapter(PagerAdapter pagerAdapter)方法设置页面内容
+将multiviewpager的Module导入到项目中,在Project Structure中添加依赖, 然后在布局xml文件中添加 `com.wosloveslife.multiviewpager.view.MultiViewPager` 控件.
+调用`void setAdapter(PagerAdapter pagerAdapter)`方法设置页面内容
 
 xml示例:
 ```
@@ -163,30 +163,28 @@ xml示例:
 java示例:
 ```
 private void initView() {
-    mGalleryViewPager = (GalleryViewPager) findViewById(R.id.id_gvp_gallery);
-    List<Bitmap> data = DataUtils.getBitmaps(getApplicationContext());
-    mGalleryViewPager.setAdapter(new SimplePagerAdapter<Bitmap>(data) {
-        @Override
-        public View onCreateView(ViewGroup container, int position) {
-            ImageView imageView = new ImageView(container.getContext());
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY  );
-            imageView.setImageBitmap(mData.get(position));
-            return imageView;
-        }
-    });
+    MultiViewPager multiViewPager = (MultiViewPager) findViewById(R.id.banner_layout);
+    final Adapter adapter = new Adapter(getSupportFragmentManager());
+    multiViewPager.setAdapter(adapter);
+    SimpleZoomOutPageTransformer transformer = new SimpleZoomOutPageTransformer();
+    multiViewPager.setTransformer(transformer);
+    transformer.setScaleValue(0.85f);
+    multiViewPager.setPageDistance(10);
 }
 ```
 
 控制方法:
 
-设置页面之间的间距<br/>
-`void setPageDistance(int distance)`
+控制缩放的比例,在0~1之间<br/>
+`void setScaleValue(float scaleValue)`<br/>
+控制两页之间的间距,单位dp<br/>
+void setPageDistance(int pageDistance)<br/>
 
 =========
 
 **Drag2DoubleUnfold:**
 
-<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/drag2doubleUnfold.gif"/>
+<img src="https://github.com/WosLovesLife/Libs/blob/master/screenshots/Intro_DragToDoubleUnfold.gif"/>
 
 使用方式:
 
@@ -197,28 +195,12 @@ private void initView() {
 
 ```
 <com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout
-     android:id="@+id/id_sdl_spread"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent">
-     <LinearLayout
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:background="#f41886"
-         android:orientation="vertical">
-         <TextView
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="Hello World!"/>
-         <ImageView
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:src="@android:drawable/alert_dark_frame"/>
-         <Button
-             android:id="@+id/id_btn_toast"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"/>
-     </LinearLayout>
- </com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout>
+    android:id="@+id/id_sdl_spread"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/layout_share_board"/>
+</com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout>
 ```
 
 控制方法: <br/>
