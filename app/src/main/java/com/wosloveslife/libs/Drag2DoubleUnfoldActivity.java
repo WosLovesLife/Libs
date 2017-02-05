@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import com.wosloveslife.drag2doubleunfold.Drag2DoubleUnfoldLayout;
 
@@ -72,14 +71,6 @@ public class Drag2DoubleUnfoldActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mDrag2DoubleUnfoldLayout.setAutoDismissEnable(isChecked);
-            }
-        });
-
-        Button button = (Button) findViewById(R.id.id_btn_toast);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(Drag2DoubleUnfoldActivity.this, "test", Toast.LENGTH_SHORT).show();
             }
         });
     }

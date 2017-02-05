@@ -9,15 +9,17 @@
         android:id="@+id/btn_add_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="添加一页"/>
+        android:text="添加一页"
+        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/et_to_position"
-        android:layout_toRightOf="@id/btn_add_data"
         android:layout_width="wrap_content"
-        android:layout_marginLeft="12dp"
         android:layout_height="wrap_content"
-        android:hint="滑动到某一页"/>
+        android:layout_marginLeft="12dp"
+        android:layout_toRightOf="@id/btn_add_data"
+        android:hint="滑动到某一页"
+        android:visibility="gone"/>
 
     <com.wosloveslife.multiviewpager.view.MultiViewPager
         android:id="@+id/banner_layout"
